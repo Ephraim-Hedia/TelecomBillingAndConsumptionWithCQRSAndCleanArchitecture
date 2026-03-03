@@ -4,7 +4,7 @@ using TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Resul
 
 namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Models
 {
-    public class GetDashboardRevenueQuery : IRequest<Response<GetDashboardRevenueResponse>>
+    public class GetUsageStatisticsQuery : IRequest<Response<UsageStatisticsResponse>>
     {
         public int Month { get; set; }
 

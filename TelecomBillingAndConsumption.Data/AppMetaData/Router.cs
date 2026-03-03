@@ -73,6 +73,20 @@
             public const string update = prefix + "{id}";
             public const string delete = prefix + "{id}";
         }
+
+        // GetDashboardOverviewQuery
+        // GetDashboardRevenueQuery
+        // GetDashboardTopCustomersPaginatedQuery
+        // GetUsageStatisticsQuery
+
+        public static class DashboardRouting
+        {
+            public const string prefix = baseRoute + "dashboard/";
+            public const string getOverview = prefix + "overview";
+            public const string getRevenue = prefix + "revenue";
+            public const string getTopCustomersPaginated = prefix + "topCustomers/paginated";
+            public const string getUsageStatistics = prefix + "usageStatistics";
+        }
     }
 
 

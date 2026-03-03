@@ -1,6 +1,10 @@
-﻿namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Models
+﻿using MediatR;
+using TelecomBillingAndConsumption.Core.Bases;
+using TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Results;
+
+namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Models
 {
-    public class GetDashboardOverviewQuery
+    public class GetDashboardOverviewQuery : IRequest<Response<GetDashboardOverviewResponse>>
     {
     }
 }
