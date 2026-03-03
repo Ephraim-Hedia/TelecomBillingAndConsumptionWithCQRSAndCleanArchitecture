@@ -5,6 +5,10 @@ namespace TelecomBillingAndConsumption.Core.Features.BillingFeatures.Commands.Mo
 {
     public class AddBillingToSubscriberIdCommand : IRequest<Response<int>>
     {
+        public int SubscriberId { get; set; }
 
+        public int Month { get; set; }
+
+        public int Year { get; set; }
     }
 }

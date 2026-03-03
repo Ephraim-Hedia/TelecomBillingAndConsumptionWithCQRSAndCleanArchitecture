@@ -6,6 +6,6 @@ namespace TelecomBillingAndConsumption.Core.Features.BillingFeatures.Queries.Mod
 {
     public class GetBillByIdQuery : IRequest<Response<GetBillByIdResponse>>
     {
-
+        public int BillId { get; set; }
     }
 }

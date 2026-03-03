@@ -5,6 +5,6 @@ namespace TelecomBillingAndConsumption.Core.Features.BillingFeatures.Queries.Mod
 {
     public class GetAllBillingsBySubscriberIdQuery : IRequest<List<GetAllBillingsBySubscriberIdResponse>>
     {
-
+        public int SubscriberId { get; set; }
     }
 }

@@ -59,6 +59,20 @@
             public const string create = prefix;
             public const string delete = prefix + "{id}";
         }
+
+        public static class BillingRouting
+        {
+            public const string prefix = baseRoute + "billing/";
+            public const string getAll = prefix;
+            public const string getAllPaginated = prefix + "Paginated";
+            public const string getById = prefix + "{id}";
+            public const string getBillingHistoryForSubscriber = prefix + "subscriber/{subscriberId}/history";
+            public const string getBillingDetailsByBillId = prefix + "{billId}/details";
+            public const string getAllBillingsBySubscriberId = prefix + "subscriber/{subscriberId}/all";
+            public const string create = prefix;
+            public const string update = prefix + "{id}";
+            public const string delete = prefix + "{id}";
+        }
     }
 
 
