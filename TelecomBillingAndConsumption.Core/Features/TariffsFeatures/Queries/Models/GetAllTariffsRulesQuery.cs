@@ -1,6 +1,10 @@
-﻿namespace TelecomBillingAndConsumption.Core.Features.TariffsFeatures.Queries.Models
+﻿using MediatR;
+using TelecomBillingAndConsumption.Core.Features.TariffsFeatures.Queries.Results;
+
+namespace TelecomBillingAndConsumption.Core.Features.TariffsFeatures.Queries.Models
 {
-    public class GetAllTariffsRulesQuery
+    public class GetAllTariffsRulesQuery : IRequest<List<GetAllTariffsRulesResponse>>
     {
+
     }
 }

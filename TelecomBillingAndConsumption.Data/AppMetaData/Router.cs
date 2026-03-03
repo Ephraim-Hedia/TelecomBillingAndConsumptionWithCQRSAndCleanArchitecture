@@ -87,6 +87,22 @@
             public const string getTopCustomersPaginated = prefix + "topCustomers/paginated";
             public const string getUsageStatistics = prefix + "usageStatistics";
         }
+
+        // AddTariffRuleCommand
+        // DeleteTariffRuleByIdCommand
+        // UpdateTariffRuleByIdCommand
+        // GetAllTariffsRulesQuery
+        // GetTariffRuleByIdQuery
+
+        public static class TariffRouting
+        {
+            public const string prefix = baseRoute + "tariffs/";
+            public const string getAll = prefix;
+            public const string getById = prefix + "{id}";
+            public const string create = prefix;
+            public const string update = prefix + "{id}";
+            public const string delete = prefix + "{id}";
+        }
     }
 
 
