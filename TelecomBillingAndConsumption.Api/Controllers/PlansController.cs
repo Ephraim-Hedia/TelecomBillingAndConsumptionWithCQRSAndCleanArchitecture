@@ -1,0 +1,41 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using TelecomBillingAndConsumption.Api.Bases;
+using TelecomBillingAndConsumption.Core.Features.PlansFeatures.Commands.Models;
+using TelecomBillingAndConsumption.Core.Features.PlansFeatures.Queries.Models;
+using TelecomBillingAndConsumption.Data.AppMetaData;
+
+namespace TelecomBillingAndConsumption.Api.Controllers
+{
+    [ApiController]
+    public class PlansController : AppControllerBase
+    {
+        [HttpGet(Router.PlansRouting.getAllPaginated)]
+        public async Task<IActionResult> GetAllPaginated()
+            => Ok(await Mediator.Send(new GetAllPlansPaginatedQuery()));
+
+
+        [HttpGet(Router.PlansRouting.getById)]
+        public async Task<IActionResult> GetById(int id)
+            => Ok(await Mediator.Send(new GetPlanByIdQuery(id)));
+
+
+        [HttpPost(Router.PlansRouting.create)]
+        public async Task<IActionResult> Create([FromBody] AddPlanCommand command)
+             => NewResult(await Mediator.Send(command));
+
+        [HttpPut(Router.PlansRouting.update)]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdatePlanByIdCommand command)
+        {
+            command.Id = id;
+            var response = await Mediator.Send(command);
+            return NewResult(response);
+        }
+
+        [HttpDelete(Router.PlansRouting.delete)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var response = await Mediator.Send(new DeletePlanByIdCommand(id));
+            return NewResult(response);
+        }
+    }
+}

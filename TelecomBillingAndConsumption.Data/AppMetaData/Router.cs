@@ -23,5 +23,17 @@
             public const string signIn = prefix + "signIn";
             public const string signOut = prefix + "signOut";
         }
+
+
+        public static class PlansRouting
+        {
+            public const string prefix = baseRoute + "plans/";
+            public const string getAll = prefix;
+            public const string getAllPaginated = prefix + "Paginated";
+            public const string getById = prefix + "{id}";
+            public const string create = prefix;
+            public const string update = prefix + "{id}";
+            public const string delete = prefix + "{id}";
+        }
     }
 }
