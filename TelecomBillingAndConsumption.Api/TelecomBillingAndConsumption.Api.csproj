@@ -17,10 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TelecomBillingAndConsumption.Api.Core\TelecomBillingAndConsumption.Core.csproj" />
-    <ProjectReference Include="..\TelecomBillingAndConsumption.Api.Data\TelecomBillingAndConsumption.Data.csproj" />
-    <ProjectReference Include="..\TelecomBillingAndConsumption.Api.Infrastructure\TelecomBillingAndConsumption.Infrastructure.csproj" />
-    <ProjectReference Include="..\TelecomBillingAndConsumption.Api.Service\TelecomBillingAndConsumption.Service.csproj" />
+    <ProjectReference Include="..\TelecomBillingAndConsumption.Core\TelecomBillingAndConsumption.Core.csproj" />
+    <ProjectReference Include="..\TelecomBillingAndConsumption.Data\TelecomBillingAndConsumption.Data.csproj" />
+    <ProjectReference Include="..\TelecomBillingAndConsumption.Infrastructure\TelecomBillingAndConsumption.Infrastructure.csproj" />
+    <ProjectReference Include="..\TelecomBillingAndConsumption.Service\TelecomBillingAndConsumption.Service.csproj" />
   </ItemGroup>
 
 </Project>

@@ -30,6 +30,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TelecomBillingAndConsumption.Api.Data\TelecomBillingAndConsumption.Data.csproj" />
+    <ProjectReference Include="..\TelecomBillingAndConsumption.Data\TelecomBillingAndConsumption.Data.csproj" />
   </ItemGroup>
 
 </Project>
