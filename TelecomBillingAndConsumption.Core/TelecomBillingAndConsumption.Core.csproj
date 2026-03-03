@@ -22,7 +22,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\" />
+    <Folder Include="Features\Authentication\Queries\Handlers\" />
+    <Folder Include="Features\Authentication\Queries\Models\" />
+    <Folder Include="Features\Authentication\Queries\Results\" />
+    <Folder Include="Features\PaymentsFeatures\Commands\Handlers\" />
+    <Folder Include="Features\PaymentsFeatures\Commands\Models\" />
+    <Folder Include="Features\PaymentsFeatures\Commands\Validators\" />
+    <Folder Include="Features\PaymentsFeatures\Queries\Handlers\" />
+    <Folder Include="Features\PaymentsFeatures\Queries\Models\" />
+    <Folder Include="Features\PaymentsFeatures\Queries\Results\" />
     <Folder Include="Mapping\" />
   </ItemGroup>
 
