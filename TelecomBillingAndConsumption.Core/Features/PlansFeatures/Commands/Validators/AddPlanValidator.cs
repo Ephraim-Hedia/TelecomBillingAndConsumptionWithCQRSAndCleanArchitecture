@@ -26,15 +26,19 @@ namespace TelecomBillingAndConsumption.Core.Features.PlansFeatures.Commands.Vali
             RuleFor(x => x.Name)
                 .NotNull().WithMessage(_localizer[SharedResourcesKeys.Required])
                 .NotEmpty().WithMessage(_localizer[SharedResourcesKeys.NotEmpty])
-                .MaximumLength(50).WithMessage("Name Max Length is 50 Char.");
+                .MaximumLength(100).WithMessage("Name maximum length is 100 characters.");
+
+            RuleFor(x => x.MonthlyFee)
+                .GreaterThan(0).WithMessage("Monthly fee must be greater than 0.");
+
             RuleFor(x => x.IncludedCallMinutes)
-                .GreaterThanOrEqualTo(0).WithMessage("Included Call Minutes must be greater than or equal to 0.");
+                .GreaterThanOrEqualTo(0).WithMessage("Included call minutes must be greater than or equal to 0.");
+
             RuleFor(x => x.IncludedDataMB)
-                .GreaterThanOrEqualTo(0).WithMessage("Included Data MB must be greater than or equal to 0.");
+                .GreaterThanOrEqualTo(0).WithMessage("Included data MB must be greater than or equal to 0.");
+
             RuleFor(x => x.IncludedSMS)
                 .GreaterThanOrEqualTo(0).WithMessage("Included SMS must be greater than or equal to 0.");
-            RuleFor(x => x.MonthlyFee)
-                .GreaterThanOrEqualTo(0).WithMessage("Monthly Fee must be greater than or equal to 0.");
         }
 
         public void ApplyCustomValidationsRules()
