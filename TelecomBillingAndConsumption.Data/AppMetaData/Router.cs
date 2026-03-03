@@ -35,5 +35,16 @@
             public const string update = prefix + "{id}";
             public const string delete = prefix + "{id}";
         }
+
+        public static class Subscribers
+        {
+            public const string prefix = baseRoute + "subscribers/";
+            public const string getAll = prefix;
+            public const string getAllPaginated = prefix + "Paginated";
+            public const string getById = prefix + "{id}";
+            public const string create = prefix;
+            public const string update = prefix + "{id}";
+            public const string delete = prefix + "{id}";
+        }
     }
 }

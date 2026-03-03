@@ -1,6 +1,10 @@
-﻿namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Queries.Models
+﻿using MediatR;
+using TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Queries.Results;
+
+namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Queries.Models
 {
-    public class GetSubscriberByIdQuery
+    public class GetSubscriberByIdQuery : IRequest<GetSubscriberByIdResponse>
     {
+        public int Id { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Queries.Results
 {
-    public class GetSubscriberByIdResponse
+    public class GetAllSubscribersPaginatedResponse
     {
         public int Id { get; set; }
 
