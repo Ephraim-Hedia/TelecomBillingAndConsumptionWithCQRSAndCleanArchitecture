@@ -6,7 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using TelecomBillingAndConsumption.Data.Entities.Identity;
-using TelecomBillingAndConsumption.Data.Helpers.JwtSettings;
+using TelecomBillingAndConsumption.Data.Helpers;
 using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
 
 namespace TelecomBillingAndConsumption.Infrastructure

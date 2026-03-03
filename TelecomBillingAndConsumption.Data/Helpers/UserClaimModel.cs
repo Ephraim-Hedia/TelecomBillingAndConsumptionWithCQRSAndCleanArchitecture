@@ -1,4 +1,4 @@
-﻿namespace TelecomBillingAndConsumption.Data.Helpers.JwtSettings
+﻿namespace TelecomBillingAndConsumption.Data.Helpers
 {
     public class UserClaimModel
     {

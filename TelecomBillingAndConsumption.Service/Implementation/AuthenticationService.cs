@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using TelecomBillingAndConsumption.Data.Entities.Identity;
-using TelecomBillingAndConsumption.Data.Helpers.JwtSettings;
+using TelecomBillingAndConsumption.Data.Helpers;
 using TelecomBillingAndConsumption.Service.Interfaces;
 
 namespace TelecomBillingAndConsumption.Service.Implementation
