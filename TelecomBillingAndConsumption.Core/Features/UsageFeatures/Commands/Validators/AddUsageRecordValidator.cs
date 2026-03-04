@@ -66,6 +66,7 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Vali
             .GreaterThan(0).WithMessage(_localizer[SharedResourcesKeys.Required] + " Subscriber Id is required.")
             .MustAsync(async (subscriberId, cancellation) =>
             {
+
                 var exists = await _subscriberService.GetByIdAsync(subscriberId);
                 return exists != null;
             })
@@ -74,10 +75,13 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Vali
             RuleFor(x => x)
     .MustAsync(async (request, cancellation) =>
     {
+        // Force IsPeak calculation
+        var hour = request.Timestamp.Hour;
+        var IsPeak = hour >= 8 && hour < 20;
         var tariff = await _tariffService.FindTariffAsync(
             request.UsageType,
             request.IsRoaming,
-            request.IsPeak
+            IsPeak
         );
         return tariff != null;
     })

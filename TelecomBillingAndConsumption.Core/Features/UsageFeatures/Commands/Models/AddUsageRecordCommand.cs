@@ -17,7 +17,6 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Mode
         public int? SMSCount { get; set; }
 
         public bool IsRoaming { get; set; }
-        public bool IsPeak { get; set; }
 
         public DateTime Timestamp { get; set; }
     }

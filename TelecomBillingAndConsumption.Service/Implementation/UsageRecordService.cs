@@ -63,6 +63,12 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             // - Subscriber exists
             // - Tariff exists for the (UsageType, IsRoaming, IsPeak)
 
+
+            // Force IsPeak calculation
+            var hour = usageRecord.Timestamp.Hour;
+            usageRecord.IsPeak = hour >= 8 && hour < 20;
+
+
             // 1. Get the needed tariff to calculate pricing; assume always found
             var tariff = await _tariffService.FindTariffAsync(
                 usageRecord.UsageType,
