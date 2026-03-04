@@ -9,7 +9,11 @@ namespace TelecomBillingAndConsumption.Core.Mapping.PlansMapping
         {
             CreateMap<AddPlanCommand, Plan>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
-                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true));
+                .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+                .ForMember(dest => dest.RowVersion, opt => opt.Ignore());
         }
     }
 }

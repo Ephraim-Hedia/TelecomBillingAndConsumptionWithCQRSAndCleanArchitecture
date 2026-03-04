@@ -24,21 +24,20 @@ namespace TelecomBillingAndConsumption.Core.Features.PlansFeatures.Commands.Vali
         public void ApplyValidationsRules()
         {
             RuleFor(x => x.Name)
-                .NotNull().WithMessage(_localizer[SharedResourcesKeys.Required])
-                .NotEmpty().WithMessage(_localizer[SharedResourcesKeys.NotEmpty])
-                .MaximumLength(100).WithMessage("Name maximum length is 100 characters.");
+                .NotEmpty().WithMessage(_localizer[SharedResourcesKeys.Required])
+                .MaximumLength(100).WithMessage(_localizer[SharedResourcesKeys.MaxLengthis100]);
 
             RuleFor(x => x.MonthlyFee)
-                .GreaterThan(0).WithMessage("Monthly fee must be greater than 0.");
+                .GreaterThanOrEqualTo(0).WithMessage(_localizer[SharedResourcesKeys.Required] + " Monthly Fee cannot be negative.");
 
             RuleFor(x => x.IncludedCallMinutes)
-                .GreaterThanOrEqualTo(0).WithMessage("Included call minutes must be greater than or equal to 0.");
+                .GreaterThanOrEqualTo(0).WithMessage(_localizer[SharedResourcesKeys.Required] + " Included Call Minutes cannot be negative.");
 
             RuleFor(x => x.IncludedDataMB)
-                .GreaterThanOrEqualTo(0).WithMessage("Included data MB must be greater than or equal to 0.");
+                .GreaterThanOrEqualTo(0).WithMessage(_localizer[SharedResourcesKeys.Required] + " Included Data MB cannot be negative.");
 
             RuleFor(x => x.IncludedSMS)
-                .GreaterThanOrEqualTo(0).WithMessage("Included SMS must be greater than or equal to 0.");
+                .GreaterThanOrEqualTo(0).WithMessage(_localizer[SharedResourcesKeys.Required] + " Included SMS cannot be negative.");
         }
 
         public void ApplyCustomValidationsRules()

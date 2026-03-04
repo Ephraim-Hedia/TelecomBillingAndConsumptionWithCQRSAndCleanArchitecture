@@ -8,7 +8,10 @@ namespace TelecomBillingAndConsumption.Core.Mapping.PlansMapping
         public void UpdatePlanByIdMapping()
         {
             CreateMap<UpdatePlanByIdCommand, Plan>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.IsDeleted, opt => opt.Ignore())
+                .ForMember(dest => dest.RowVersion, opt => opt.Ignore());
         }
     }
 }

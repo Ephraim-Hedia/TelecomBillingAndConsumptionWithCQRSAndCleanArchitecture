@@ -6,7 +6,10 @@ namespace TelecomBillingAndConsumption.Core.Mapping.PlansMapping
     {
         public PlansProfile()
         {
-
+            AddPlanMapping();
+            UpdatePlanByIdMapping();
+            GetAllPlansPaginatedMapping();
+            GetPlanByIdMapping();
         }
     }
 }
