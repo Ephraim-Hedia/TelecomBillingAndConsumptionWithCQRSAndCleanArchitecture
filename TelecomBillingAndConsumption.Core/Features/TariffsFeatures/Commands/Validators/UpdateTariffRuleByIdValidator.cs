@@ -26,8 +26,7 @@ namespace TelecomBillingAndConsumption.Core.Features.TariffsFeatures.Commands.Va
                 .GreaterThan(0).WithMessage("Id must be greater than 0.");
             RuleFor(x => x.PricePerUnit)
                 .GreaterThan(0).WithMessage("Price per unit must be greater than 0.");
-            RuleFor(x => x.EffectiveFrom)
-                .LessThan(DateTime.Now).WithMessage("Effective from date must be in the past.");
+
             RuleFor(x => x.UsageType)
                 .IsInEnum().WithMessage("Invalid usage type.");
             RuleFor(x => x.IsPeak)

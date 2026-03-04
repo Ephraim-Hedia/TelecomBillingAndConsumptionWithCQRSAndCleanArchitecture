@@ -23,7 +23,6 @@ namespace TelecomBillingAndConsumption.Infrastructure.Configuration
                 t.UsageType,
                 t.IsRoaming,
                 t.IsPeak,
-                t.EffectiveFrom
             });
 
             builder.HasQueryFilter(t => !t.IsDeleted);

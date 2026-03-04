@@ -7,5 +7,7 @@ namespace TelecomBillingAndConsumption.Core.Features.TariffsFeatures.Queries.Mod
     public class GetTariffRuleByIdQuery : IRequest<Response<GetTariffRuleByIdResponse>>
     {
         public int Id { get; set; }
+        public GetTariffRuleByIdQuery(int id) => Id = id;
+
     }
 }

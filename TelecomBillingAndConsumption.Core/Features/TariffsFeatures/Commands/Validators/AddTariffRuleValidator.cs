@@ -23,12 +23,11 @@ namespace TelecomBillingAndConsumption.Core.Features.TariffsFeatures.Commands.Va
         public void ApplyValidationsRules()
         {
             RuleFor(x => x.PricePerUnit)
-                .GreaterThan(0).WithMessage("Price per unit must be greater than 0.");
-            RuleFor(x => x.EffectiveFrom)
-                .LessThan(DateTime.Now).WithMessage("Effective from date must be in the past.");
-
+                .GreaterThanOrEqualTo(0)
+                .WithMessage(_localizer[SharedResourcesKeys.Required] + " Price must be non-negative.");
             RuleFor(x => x.UsageType)
-                .IsInEnum().WithMessage("Invalid usage type.");
+                .IsInEnum()
+                .WithMessage("Invalid Usage Type.");
 
             RuleFor(x => x.IsPeak)
                 .NotNull().WithMessage("IsPeak must be specified.");

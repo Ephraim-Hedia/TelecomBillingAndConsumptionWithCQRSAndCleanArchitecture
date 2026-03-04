@@ -6,5 +6,7 @@ namespace TelecomBillingAndConsumption.Core.Features.TariffsFeatures.Commands.Mo
     public class DeleteTariffRuleByIdCommand : IRequest<Response<string>>
     {
         public int Id { get; set; }
+        public DeleteTariffRuleByIdCommand(int id) => Id = id;
+
     }
 }

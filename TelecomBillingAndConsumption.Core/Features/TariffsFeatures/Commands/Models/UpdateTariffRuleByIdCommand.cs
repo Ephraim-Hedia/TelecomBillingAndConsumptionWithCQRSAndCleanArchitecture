@@ -9,15 +9,8 @@ namespace TelecomBillingAndConsumption.Core.Features.TariffsFeatures.Commands.Mo
         public int Id { get; set; }
 
         public UsageType UsageType { get; set; }
-
         public bool IsRoaming { get; set; }
-
         public bool IsPeak { get; set; }
-
         public decimal PricePerUnit { get; set; }
-
-        public DateTime EffectiveFrom { get; set; }
-
-        public DateTime? EffectiveTo { get; set; }
     }
 }

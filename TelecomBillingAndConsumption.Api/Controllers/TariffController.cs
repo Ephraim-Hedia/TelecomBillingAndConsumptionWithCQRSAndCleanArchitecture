@@ -15,42 +15,28 @@ namespace TelecomBillingAndConsumption.Api.Controllers
         // GetAllTariffsRulesQuery
         // GetTariffRuleByIdQuery
 
-        [HttpPost]
-        [Route(Router.TariffRouting.create)]
-        public async Task<IActionResult> AddTariffRule([FromBody] AddTariffRuleCommand command)
+        [HttpPost(Router.TariffRouting.create)]
+        public async Task<IActionResult> Create([FromBody] AddTariffRuleCommand command)
+            => NewResult(await Mediator.Send(command));
+
+        [HttpDelete(Router.TariffRouting.delete)]
+        public async Task<IActionResult> Delete(int id)
+            => NewResult(await Mediator.Send(new DeleteTariffRuleByIdCommand(id)));
+
+        [HttpPut(Router.TariffRouting.update)]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateTariffRuleByIdCommand command)
         {
-            var response = await Mediator.Send(command);
-            return NewResult(response);
-        }
-        [HttpDelete]
-        [Route(Router.TariffRouting.delete)]
-        public async Task<IActionResult> DeleteTariffRuleById([FromRoute] DeleteTariffRuleByIdCommand command)
-        {
-            var response = await Mediator.Send(command);
-            return NewResult(response);
+            command.Id = id;
+            var result = await Mediator.Send(command);
+            return NewResult(result);
         }
 
-        [HttpPut]
-        [Route(Router.TariffRouting.update)]
-        public async Task<IActionResult> UpdateTariffRuleById([FromRoute] UpdateTariffRuleByIdCommand command)
-        {
-            var response = await Mediator.Send(command);
-            return NewResult(response);
-        }
-        [HttpGet]
-        [Route(Router.TariffRouting.getAll)]
-        public async Task<IActionResult> GetAllTariffsRules()
-        {
-            var response = await Mediator.Send(new GetAllTariffsRulesQuery());
-            return Ok(response);
-        }
+        [HttpGet(Router.TariffRouting.getAll)]
+        public async Task<IActionResult> GetAll()
+            => Ok(await Mediator.Send(new GetAllTariffRulesQuery()));
 
-        [HttpGet]
-        [Route(Router.TariffRouting.getById)]
-        public async Task<IActionResult> GetTariffRuleById([FromRoute] GetTariffRuleByIdQuery query)
-        {
-            var response = await Mediator.Send(query);
-            return NewResult(response);
-        }
+        [HttpGet(Router.TariffRouting.getById)]
+        public async Task<IActionResult> GetById(int id)
+            => Ok(await Mediator.Send(new GetTariffRuleByIdQuery(id)));
     }
 }

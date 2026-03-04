@@ -12,8 +12,5 @@ namespace TelecomBillingAndConsumption.Data.Entities
 
         public decimal PricePerUnit { get; set; }
 
-        public DateTime EffectiveFrom { get; set; }
-
-        public DateTime? EffectiveTo { get; set; }
     }
 }
