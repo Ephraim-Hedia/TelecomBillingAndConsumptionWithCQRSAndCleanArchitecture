@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
 using TelecomBillingAndConsumption.Data.Entities;
+using TelecomBillingAndConsumption.Data.Helpers;
 using TelecomBillingAndConsumption.Infrastructure.InfrastructureBases;
 using TelecomBillingAndConsumption.Service.Interfaces;
 
@@ -59,6 +60,15 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             return true;
         }
 
+        public async Task<TariffRule?> FindTariffAsync(UsageType usageType, bool isRoaming, bool isPeak)
+        {
+            return await _tariffRepository.GetTableNoTracking()
+                .FirstOrDefaultAsync(t =>
+                    t.UsageType == usageType &&
+                    t.IsRoaming == isRoaming &&
+                    t.IsPeak == isPeak &&
+                    !t.IsDeleted);
+        }
         #endregion
     }
 }

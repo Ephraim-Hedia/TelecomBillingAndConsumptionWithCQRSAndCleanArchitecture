@@ -10,16 +10,25 @@ namespace TelecomBillingAndConsumption.Api.Controllers
     [ApiController]
     public class UsageRecordsController : AppControllerBase
     {
+
+        //[HttpGet]
+        //[Route(Router.UsageRecords.getAllPaginated)]
+        //public async Task<IActionResult> GetAllPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        //{
+        //    return Ok(await Mediator.Send(new GetAllUsageRecordsPaginatedQuery { PageNumber = pageNumber, PageSize = pageSize }));
+        //}
+
         [HttpGet(Router.UsageRecords.getById)]
         public async Task<IActionResult> GetUsageRecordById(int id)
         {
-            return Ok(await Mediator.Send(new GetUsageByIdQuery() { Id = id }));
+            return Ok(await Mediator.Send(new GetUsageRecordByIdQuery() { Id = id }));
         }
 
-        [HttpGet(Router.UsageRecords.getBySubscriberId)]
-        public async Task<IActionResult> GetUsageRecordsBySubscriberId(int subscriberId)
+        [HttpGet]
+        [Route(Data.AppMetaData.Router.UsageRecords.getBySubscriberId)]
+        public async Task<IActionResult> GetBySubscriberId([FromRoute] int subscriberId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            return Ok(await Mediator.Send(new GetUsageRecordsBySubscriberIdQuery() { SubscriberId = subscriberId }));
+            return Ok(await Mediator.Send(new GetUsageRecordsBySubscriberIdQuery { SubscriberId = subscriberId, PageNumber = pageNumber, PageSize = pageSize }));
         }
 
         [HttpPost(Router.UsageRecords.create)]

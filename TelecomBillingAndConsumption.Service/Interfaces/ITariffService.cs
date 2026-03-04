@@ -1,4 +1,5 @@
 ﻿using TelecomBillingAndConsumption.Data.Entities;
+using TelecomBillingAndConsumption.Data.Helpers;
 
 namespace TelecomBillingAndConsumption.Service.Interfaces
 {
@@ -10,5 +11,6 @@ namespace TelecomBillingAndConsumption.Service.Interfaces
         Task<bool> UpdateAsync(TariffRule tariffRule);
         Task<bool> DeleteAsync(int id);
         Task<TariffRule?> GetByIdAsync(int id);
+        Task<TariffRule?> FindTariffAsync(UsageType usageType, bool isRoaming, bool isPeak);
     }
 }

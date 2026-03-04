@@ -2,7 +2,7 @@
 
 namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Queries.Results
 {
-    public class GetUsageByIdResponse
+    public class GetUsageRecordByIdResponse
     {
         public int Id { get; set; }
 

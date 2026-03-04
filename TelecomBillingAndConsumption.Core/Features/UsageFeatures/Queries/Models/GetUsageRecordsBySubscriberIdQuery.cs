@@ -7,5 +7,8 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Queries.Model
     public class GetUsageRecordsBySubscriberIdQuery : IRequest<PaginatedResult<GetUsageRecordsBySubscriberIdResponse>>
     {
         public int SubscriberId { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; }
+
     }
 }
