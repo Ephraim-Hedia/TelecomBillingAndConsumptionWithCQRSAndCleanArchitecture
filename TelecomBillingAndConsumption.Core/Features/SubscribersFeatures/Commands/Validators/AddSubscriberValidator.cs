@@ -37,6 +37,8 @@ namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Command
                 .MaximumLength(50).WithMessage("Country Max Length is 50 Char.");
             RuleFor(x => x.PlanId)
                 .GreaterThan(0).WithMessage("Plan Id must be greater than 0.");
+
+
         }
 
         public void ApplyCustomValidationsRules()

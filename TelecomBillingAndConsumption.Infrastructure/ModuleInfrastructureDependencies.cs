@@ -11,6 +11,7 @@ namespace TelecomBillingAndConsumption.Infrastructure
         {
             services.AddTransient(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IPlanRepository, PlanRepository>();
+            services.AddScoped<ISubscriberRepository, SubscriberRepository>();
 
             return services;
         }

@@ -1,6 +1,9 @@
-﻿namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Commands.Models
+﻿using MediatR;
+using TelecomBillingAndConsumption.Core.Bases;
+
+namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Commands.Models
 {
-    public class AddSubscriberCommand
+    public class AddSubscriberCommand : IRequest<Response<int>>
     {
         public string Name { get; set; }
 

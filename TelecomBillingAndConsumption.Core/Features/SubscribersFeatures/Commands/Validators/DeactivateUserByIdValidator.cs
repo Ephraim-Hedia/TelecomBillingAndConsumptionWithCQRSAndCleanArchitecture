@@ -5,7 +5,7 @@ using TelecomBillingAndConsumption.Core.Resources;
 
 namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Commands.Validators
 {
-    public class DeactivateUserByIdValidator : AbstractValidator<DeactivateUserByIdCommand>
+    public class DeactivateUserByIdValidator : AbstractValidator<DeactivateSubscriberByIdCommand>
     {
         #region Fields
         private readonly IStringLocalizer<SharedResources> _localizer;

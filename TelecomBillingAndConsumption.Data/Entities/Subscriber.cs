@@ -22,8 +22,8 @@
         // Navigation
         public Plan Plan { get; set; } = null!;
 
-        public ICollection<UsageRecord> UsageRecords { get; set; } = new HashSet<UsageRecord>();
+        public ICollection<UsageRecord>? UsageRecords { get; set; } = new HashSet<UsageRecord>();
 
-        public ICollection<Bill> Bills { get; set; } = new HashSet<Bill>();
+        public ICollection<Bill>? Bills { get; set; } = new HashSet<Bill>();
     }
 }

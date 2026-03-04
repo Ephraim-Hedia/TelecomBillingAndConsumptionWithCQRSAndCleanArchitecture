@@ -51,6 +51,7 @@
             public const string deactivate = prefix + "{id}/deactivate";
         }
 
+
         public static class UsageRecords
         {
             public const string prefix = baseRoute + "usageRecords/";

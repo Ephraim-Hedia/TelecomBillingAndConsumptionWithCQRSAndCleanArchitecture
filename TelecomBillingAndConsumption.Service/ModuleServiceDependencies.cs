@@ -14,6 +14,8 @@ namespace TelecomBillingAndConsumption.Service
             services.AddScoped<IPlanService, PlanService>();
             // Tariff Service
             services.AddScoped<ITariffService, TariffService>();
+            // Subscriber Service
+            services.AddScoped<ISubscriberService, SubscriberService>();
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             return services;
         }

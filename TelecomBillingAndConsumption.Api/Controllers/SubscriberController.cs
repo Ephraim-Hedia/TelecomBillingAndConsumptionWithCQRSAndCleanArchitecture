@@ -2,59 +2,45 @@
 using TelecomBillingAndConsumption.Api.Bases;
 using TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Commands.Models;
 using TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Queries.Models;
+using TelecomBillingAndConsumption.Data.AppMetaData;
 
 namespace TelecomBillingAndConsumption.Api.Controllers
 {
     [ApiController]
     public class SubscriberController : AppControllerBase
     {
-        [HttpGet]
-        [Route(Data.AppMetaData.Router.Subscribers.getAllPaginated)]
-        public async Task<IActionResult> GetAllPaginated([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
-        {
-            return Ok(await Mediator.Send(new GetAllSubscribersPaginatedQuery() { PageNumber = pageNumber, PageSize = pageSize }));
-        }
 
-        [HttpGet]
-        [Route(Data.AppMetaData.Router.Subscribers.getById)]
-        public async Task<IActionResult> GetById([FromRoute] int id)
-        {
-            return Ok(await Mediator.Send(new GetSubscriberByIdQuery() { Id = id }));
-        }
-        [HttpPost]
-        [Route(Data.AppMetaData.Router.Subscribers.create)]
+
+        [HttpGet(Router.Subscribers.getAllPaginated)]
+        public async Task<IActionResult> GetAllPaginated([FromQuery] GetAllSubscribersPaginatedQuery query)
+        => Ok(await Mediator.Send(query));
+
+        [HttpGet(Router.Subscribers.getById)]
+        public async Task<IActionResult> GetById(int id)
+        => Ok(await Mediator.Send(new GetSubscriberByIdQuery(id)));
+
+        [HttpPost(Router.Subscribers.create)]
         public async Task<IActionResult> Create([FromBody] AddSubscriberCommand command)
-        {
-            return Ok(await Mediator.Send(command));
-        }
+        => Ok(await Mediator.Send(command));
 
         [HttpPut]
-        [Route(Data.AppMetaData.Router.Subscribers.update)]
+        [Route(Router.Subscribers.update)]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateSubscriberByIdCommand command)
         {
             command.Id = id;
             return Ok(await Mediator.Send(command));
         }
 
-        [HttpDelete]
-        [Route(Data.AppMetaData.Router.Subscribers.delete)]
-        public async Task<IActionResult> Delete([FromRoute] int id)
-        {
-            return Ok(await Mediator.Send(new DeleteSubscriberByIdCommand(id)));
-        }
+        [HttpDelete(Router.Subscribers.delete)]
+        public async Task<IActionResult> Delete(int id)
+        => NewResult(await Mediator.Send(new DeleteSubscriberByIdCommand(id)));
 
-        [HttpPatch]
-        [Route(Data.AppMetaData.Router.Subscribers.activate)]
-        public async Task<IActionResult> Activate([FromRoute] int id)
-        {
-            return Ok(await Mediator.Send(new ActivateUserByIdCommand(id)));
-        }
+        [HttpPut(Router.Subscribers.activate)]
+        public async Task<IActionResult> Activate(int id)
+        => NewResult(await Mediator.Send(new ActivateSubscriberByIdCommand(id)));
 
-        [HttpPatch]
-        [Route(Data.AppMetaData.Router.Subscribers.deactivate)]
-        public async Task<IActionResult> Deactivate([FromRoute] int id)
-        {
-            return Ok(await Mediator.Send(new DeactivateUserByIdCommand(id)));
-        }
+        [HttpPut(Router.Subscribers.deactivate)]
+        public async Task<IActionResult> Deactivate(int id)
+            => NewResult(await Mediator.Send(new DeactivateSubscriberByIdCommand(id)));
     }
 }
