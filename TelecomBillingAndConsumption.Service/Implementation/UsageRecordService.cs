@@ -12,14 +12,17 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         private readonly IGenericRepository<UsageRecord> _usageRecordRepository;
         private readonly ITariffService _tariffService;
         private readonly ISubscriberService _subscriberService;
+        private readonly IPlanLimitService _planLimitService;
         #endregion
 
         #region Constructors
         public UsageRecordService(
+            IPlanLimitService planLimitService,
             ITariffService tariffService,
             IGenericRepository<UsageRecord> usageRecordRepository,
             ISubscriberService subscriberService)
         {
+            _planLimitService = planLimitService;
             _tariffService = tariffService;
             _usageRecordRepository = usageRecordRepository;
             _subscriberService = subscriberService;
@@ -53,7 +56,6 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         // Gets usage record by id
         public async Task<UsageRecord?> GetByIdAsync(int id)
         {
-
             return await QueryUsageRecordsWithIncludes()
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
@@ -61,24 +63,44 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         // Create/Add
         public async Task<int> AddAsync(UsageRecord usageRecord)
         {
-            // Get the subscriber (already validated by the validator)
+            // 1. Load the subscriber
             var subscriber = await _subscriberService.GetByIdAsync(usageRecord.SubscriberId);
 
-            // Set IsRoaming from subscriber table
+            // 2. Set IsRoaming from subscriber table
             usageRecord.IsRoaming = subscriber.IsRoaming;
 
-            // Calculate IsPeak from timestamp
+            // 3. Calculate IsPeak from timestamp
             var hour = usageRecord.Timestamp.Hour;
             usageRecord.IsPeak = hour >= 8 && hour < 20;
 
-            // Find matching tariff
+
+            // 4. Check plan limits for overage logic
+            bool callLimitExceeded = usageRecord.CallMinutes.HasValue
+                && await _planLimitService.IsCallLimitExceededAsync(usageRecord.SubscriberId, usageRecord.Timestamp, usageRecord.CallMinutes.Value);
+
+            bool dataLimitExceeded = usageRecord.DataMB.HasValue
+                && await _planLimitService.IsDataLimitExceededAsync(usageRecord.SubscriberId, usageRecord.Timestamp, usageRecord.DataMB.Value);
+
+            bool smsLimitExceeded = usageRecord.SMSCount.HasValue
+                && await _planLimitService.IsSmsLimitExceededAsync(usageRecord.SubscriberId, usageRecord.Timestamp, usageRecord.SMSCount.Value);
+
+            // 5. Get matching tariff
             var tariff = await _tariffService.FindTariffAsync(
                 usageRecord.UsageType,
                 usageRecord.IsRoaming,
                 usageRecord.IsPeak);
 
-            usageRecord.UnitPrice = tariff.PricePerUnit;
+            // 6. Apply double rate if overage
+            decimal unitPrice = tariff.PricePerUnit;
+            if (usageRecord.UsageType == UsageType.Call && callLimitExceeded)
+                unitPrice *= 2;
+            else if (usageRecord.UsageType == UsageType.Data && dataLimitExceeded)
+                unitPrice *= 2;
+            else if (usageRecord.UsageType == UsageType.SMS && smsLimitExceeded)
+                unitPrice *= 2;
 
+            // 7. Calculate total cost
+            usageRecord.UnitPrice = unitPrice;
             usageRecord.TotalCost = usageRecord.UsageType switch
             {
                 UsageType.Call => (usageRecord.CallMinutes ?? 0) * usageRecord.UnitPrice,
@@ -87,6 +109,7 @@ namespace TelecomBillingAndConsumption.Service.Implementation
                 _ => throw new Exception("Unknown UsageType.")
             };
 
+            // 8. Save record
             var result = await _usageRecordRepository.AddAsync(usageRecord);
             return result.Id;
         }
