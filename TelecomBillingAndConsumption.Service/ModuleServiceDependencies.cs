@@ -18,6 +18,8 @@ namespace TelecomBillingAndConsumption.Service
             services.AddScoped<ISubscriberService, SubscriberService>();
             // Usage Records Service
             services.AddScoped<IUsageRecordService, UsageRecordService>();
+            // Plan Limit Service 
+            services.AddScoped<IPlanLimitService, PlanLimitService>();
 
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             return services;
