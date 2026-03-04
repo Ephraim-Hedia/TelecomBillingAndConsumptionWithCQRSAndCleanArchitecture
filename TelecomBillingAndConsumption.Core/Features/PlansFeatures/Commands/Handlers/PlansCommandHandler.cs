@@ -10,6 +10,7 @@ using TelecomBillingAndConsumption.Service.Interfaces.PlanService;
 namespace TelecomBillingAndConsumption.Core.Features.PlansFeatures.Commands.Handlers
 {
     public class PlansCommandHandler : ResponseHandler,
+        IRequestHandler<AddPlanCommand, Response<int>>,
         IRequestHandler<UpdatePlanByIdCommand, Response<string>>,
         IRequestHandler<DeletePlanByIdCommand, Response<string>>
     {
