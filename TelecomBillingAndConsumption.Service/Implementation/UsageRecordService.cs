@@ -3,6 +3,7 @@ using TelecomBillingAndConsumption.Data.Entities;
 using TelecomBillingAndConsumption.Data.Helpers;
 using TelecomBillingAndConsumption.Infrastructure.InfrastructureBases;
 using TelecomBillingAndConsumption.Service.Interfaces;
+using TelecomBillingAndConsumption.Service.Interfaces.PlanService;
 
 namespace TelecomBillingAndConsumption.Service.Implementation
 {
@@ -12,17 +13,18 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         private readonly IGenericRepository<UsageRecord> _usageRecordRepository;
         private readonly ITariffService _tariffService;
         private readonly ISubscriberService _subscriberService;
-        private readonly IPlanLimitService _planLimitService;
+        private readonly IPlanService _planService;
         #endregion
 
         #region Constructors
         public UsageRecordService(
-            IPlanLimitService planLimitService,
+            IPlanService planService,
             ITariffService tariffService,
             IGenericRepository<UsageRecord> usageRecordRepository,
             ISubscriberService subscriberService)
         {
-            _planLimitService = planLimitService;
+            _planService = planService;
+
             _tariffService = tariffService;
             _usageRecordRepository = usageRecordRepository;
             _subscriberService = subscriberService;
@@ -73,41 +75,57 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             var hour = usageRecord.Timestamp.Hour;
             usageRecord.IsPeak = hour >= 8 && hour < 20;
 
+            // 4. Get subscriber plan via _planService
+            var plan = await _planService.GetByIdAsync(subscriber.PlanId);
 
-            // 4. Check plan limits for overage logic
-            bool callLimitExceeded = usageRecord.CallMinutes.HasValue
-                && await _planLimitService.IsCallLimitExceededAsync(usageRecord.SubscriberId, usageRecord.Timestamp, usageRecord.CallMinutes.Value);
+            // 5. Get all usage records for current month (no tracking for efficiency)
+            var monthStart = new DateTime(usageRecord.Timestamp.Year, usageRecord.Timestamp.Month, 1);
+            var monthEnd = monthStart.AddMonths(1);
 
-            bool dataLimitExceeded = usageRecord.DataMB.HasValue
-                && await _planLimitService.IsDataLimitExceededAsync(usageRecord.SubscriberId, usageRecord.Timestamp, usageRecord.DataMB.Value);
+            var usageRecordsThisMonth = await _usageRecordRepository.GetTableNoTracking()
+                .Where(r => r.SubscriberId == usageRecord.SubscriberId
+                         && r.Timestamp >= monthStart
+                         && r.Timestamp < monthEnd)
+                .ToListAsync();
 
-            bool smsLimitExceeded = usageRecord.SMSCount.HasValue
-                && await _planLimitService.IsSmsLimitExceededAsync(usageRecord.SubscriberId, usageRecord.Timestamp, usageRecord.SMSCount.Value);
-
-            // 5. Get matching tariff
+            // 6. Get matching tariff
             var tariff = await _tariffService.FindTariffAsync(
                 usageRecord.UsageType,
                 usageRecord.IsRoaming,
                 usageRecord.IsPeak);
 
-            // 6. Apply double rate if overage
             decimal unitPrice = tariff.PricePerUnit;
-            if (usageRecord.UsageType == UsageType.Call && callLimitExceeded)
-                unitPrice *= 2;
-            else if (usageRecord.UsageType == UsageType.Data && dataLimitExceeded)
-                unitPrice *= 2;
-            else if (usageRecord.UsageType == UsageType.SMS && smsLimitExceeded)
-                unitPrice *= 2;
 
-            // 7. Calculate total cost
-            usageRecord.UnitPrice = unitPrice;
-            usageRecord.TotalCost = usageRecord.UsageType switch
+            // 7. Calculate total cost according to business rules
+            switch (usageRecord.UsageType)
             {
-                UsageType.Call => (usageRecord.CallMinutes ?? 0) * usageRecord.UnitPrice,
-                UsageType.Data => (usageRecord.DataMB ?? 0) * usageRecord.UnitPrice,
-                UsageType.SMS => (usageRecord.SMSCount ?? 0) * usageRecord.UnitPrice,
-                _ => throw new Exception("Unknown UsageType.")
-            };
+                case UsageType.Call:
+                    int alreadyUsedMin = usageRecordsThisMonth.Sum(r => r.CallMinutes ?? 0);
+                    int newMin = usageRecord.CallMinutes ?? 0;
+                    int bundleLimitMin = plan.IncludedCallMinutes;
+                    usageRecord.TotalCost = CalculateTieredCost(alreadyUsedMin, bundleLimitMin, newMin, unitPrice);
+                    usageRecord.UnitPrice = usageRecord.TotalCost / newMin;
+                    break;
+
+                case UsageType.Data:
+                    decimal alreadyUsedMB = usageRecordsThisMonth.Sum(r => r.DataMB ?? 0);
+                    decimal newMB = usageRecord.DataMB ?? 0;
+                    decimal bundleLimitMB = plan.IncludedDataMB;
+                    usageRecord.TotalCost = CalculateTieredCostDecimal(alreadyUsedMB, bundleLimitMB, newMB, unitPrice);
+                    usageRecord.UnitPrice = usageRecord.TotalCost / newMB;
+                    break;
+
+                case UsageType.SMS:
+                    int alreadyUsedSms = usageRecordsThisMonth.Sum(r => r.SMSCount ?? 0);
+                    int newSms = usageRecord.SMSCount ?? 0;
+                    int bundleLimitSms = plan.IncludedSMS;
+                    usageRecord.TotalCost = CalculateTieredCost(alreadyUsedSms, bundleLimitSms, newSms, unitPrice);
+                    usageRecord.UnitPrice = usageRecord.TotalCost / newSms;
+                    break;
+
+                default:
+                    throw new Exception("Unknown UsageType.");
+            }
 
             // 8. Save record
             var result = await _usageRecordRepository.AddAsync(usageRecord);
@@ -123,6 +141,31 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             record.IsDeleted = true;
             await _usageRecordRepository.UpdateAsync(record);
             return true;
+        }
+
+        #endregion
+
+
+        #region Private Helper Functions
+
+        private decimal CalculateTieredCost(
+            int alreadyUsed, int bundleLimit, int newUnits, decimal unitPrice)
+        {
+            int remainingBundle = Math.Max(bundleLimit - alreadyUsed, 0);
+            int normalUnits = Math.Min(newUnits, remainingBundle);
+            int overageUnits = newUnits - normalUnits;
+            decimal totalCost = (normalUnits * unitPrice) + (overageUnits * unitPrice * 2);
+            return totalCost;
+        }
+
+        private decimal CalculateTieredCostDecimal(
+            decimal alreadyUsed, decimal bundleLimit, decimal newUnits, decimal unitPrice)
+        {
+            decimal remainingBundle = Math.Max(bundleLimit - alreadyUsed, 0);
+            decimal normalUnits = Math.Min(newUnits, remainingBundle);
+            decimal overageUnits = newUnits - normalUnits;
+            decimal totalCost = (normalUnits * unitPrice) + (overageUnits * unitPrice * 2);
+            return totalCost;
         }
 
         #endregion
