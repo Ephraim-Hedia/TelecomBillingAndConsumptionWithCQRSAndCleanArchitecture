@@ -42,5 +42,9 @@ namespace TelecomBillingAndConsumption.Api.Controllers
         [HttpPut(Router.Subscribers.deactivate)]
         public async Task<IActionResult> Deactivate(int id)
             => NewResult(await Mediator.Send(new DeactivateSubscriberByIdCommand(id)));
+
+        [HttpGet(Router.Subscribers.SubscriberUsageSummary)]
+        public async Task<IActionResult> GetByIdSubscriberUsageSummary(int id)
+        => Ok(await Mediator.Send(new GetSubscriberUsageSummaryQuery(id)));
     }
 }

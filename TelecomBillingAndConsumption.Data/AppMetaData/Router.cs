@@ -49,6 +49,7 @@
             public const string delete = prefix + "{id}";
             public const string activate = prefix + "{id}/activate";
             public const string deactivate = prefix + "{id}/deactivate";
+            public const string SubscriberUsageSummary = prefix + "{id}/SubscriberUsageSummary";
         }
 
 

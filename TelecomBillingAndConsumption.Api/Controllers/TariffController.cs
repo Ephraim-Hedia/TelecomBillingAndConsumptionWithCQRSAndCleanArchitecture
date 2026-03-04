@@ -15,6 +15,16 @@ namespace TelecomBillingAndConsumption.Api.Controllers
         // GetAllTariffsRulesQuery
         // GetTariffRuleByIdQuery
 
+        //| UsageType | IsRoaming | IsPeak | PricePerUnit |
+        //| --------- | --------- | ------ | ------------ |
+        //| Call      | false     | true   | 0.15         |
+        //| Call      | false     | false  | 0.05         |
+        //| Data      | false     | false  | 0.05         |
+        //| Data      | true      | false  | 0.20         |
+        //| SMS       | false     | false  | 0.02         |
+        //| SMS       | true      | false  | 0.10         |
+
+
         [HttpPost(Router.TariffRouting.create)]
         public async Task<IActionResult> Create([FromBody] AddTariffRuleCommand command)
             => NewResult(await Mediator.Send(command));
