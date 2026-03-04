@@ -11,5 +11,6 @@ namespace TelecomBillingAndConsumption.Service.Interfaces
         Task<bool> DeleteAsync(int id);
         Task<bool> ActivateAsync(int id);
         Task<bool> DeactivateAsync(int id);
+        public Task<bool> ExistsByPhoneAsync(string phoneNumber);
     }
 }

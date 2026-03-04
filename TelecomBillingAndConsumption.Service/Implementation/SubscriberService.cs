@@ -1,4 +1,5 @@
-﻿using TelecomBillingAndConsumption.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TelecomBillingAndConsumption.Data.Entities;
 using TelecomBillingAndConsumption.Infrastructure.Interfaces;
 using TelecomBillingAndConsumption.Service.Interfaces;
 
@@ -21,17 +22,18 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         #region Handle Functions
         public IQueryable<Subscriber> QuerySubscribers()
         {
-            return _subscriberRepository.GetTableNoTracking().Where(x => !x.IsDeleted);
+            return _subscriberRepository.QueryWithIncludes();
         }
 
         public async Task<Subscriber?> GetByIdAsync(int id)
         {
-            var s = await _subscriberRepository.GetByIdAsync(id);
+            var s = await _subscriberRepository.GetSubscriberByIdWithIncludes(id);
             return s != null && !s.IsDeleted ? s : null;
         }
 
         public async Task<int> AddAsync(Subscriber s)
         {
+            s.SubscriptionStartDate = DateTime.UtcNow;
             var result = await _subscriberRepository.AddAsync(s);
             return result.Id;
         }
@@ -74,7 +76,10 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             return true;
         }
 
-
+        public async Task<bool> ExistsByPhoneAsync(string phoneNumber)
+        {
+            return await _subscriberRepository.GetTableNoTracking().AnyAsync(s => s.PhoneNumber == phoneNumber && !s.IsDeleted);
+        }
         #endregion
 
     }

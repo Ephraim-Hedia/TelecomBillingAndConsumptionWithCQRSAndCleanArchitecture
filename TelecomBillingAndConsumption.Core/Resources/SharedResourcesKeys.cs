@@ -30,6 +30,7 @@
         public const string InvalidCredentials = "InvalidCredentials";
         public const string PlanActivated = "PlanActivated";
         public const string PlanDeactivated = "PlanDeactivated";
+        public const string PhoneNumber = "PhoneNumber";
 
 
         public const string AlgorithmIsWrong = "AlgorithmIsWrong";

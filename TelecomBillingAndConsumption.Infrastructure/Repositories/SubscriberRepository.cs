@@ -1,4 +1,5 @@
-﻿using TelecomBillingAndConsumption.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TelecomBillingAndConsumption.Data.Entities;
 using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
 using TelecomBillingAndConsumption.Infrastructure.InfrastructureBases;
 using TelecomBillingAndConsumption.Infrastructure.Interfaces;
@@ -9,6 +10,23 @@ namespace TelecomBillingAndConsumption.Infrastructure.Repositories
     {
         public SubscriberRepository(ApplicationDbContext context) : base(context)
         {
+        }
+
+        public async Task<Subscriber> GetSubscriberByIdWithIncludes(int id)
+        {
+            return await GetTableNoTracking()
+                .Include(s => s.Plan)
+                .Include(s => s.Bills)
+                .Include(s => s.UsageRecords).FirstOrDefaultAsync(s => s.Id == id);  // Add more Includes if needed
+        }
+
+        public IQueryable<Subscriber> QueryWithIncludes()
+        {
+            return GetTableNoTracking()
+            .Include(s => s.Plan)
+            .Include(s => s.Bills)
+            .Include(s => s.UsageRecords)
+            .Where(s => !s.IsDeleted);  // Add more Includes if needed
         }
     }
 }
