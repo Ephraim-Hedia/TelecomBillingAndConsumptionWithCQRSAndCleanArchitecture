@@ -11,15 +11,18 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         #region Fields
         private readonly IGenericRepository<UsageRecord> _usageRecordRepository;
         private readonly ITariffService _tariffService;
+        private readonly ISubscriberService _subscriberService;
         #endregion
 
         #region Constructors
         public UsageRecordService(
             ITariffService tariffService,
-            IGenericRepository<UsageRecord> usageRecordRepository)
+            IGenericRepository<UsageRecord> usageRecordRepository,
+            ISubscriberService subscriberService)
         {
             _tariffService = tariffService;
             _usageRecordRepository = usageRecordRepository;
+            _subscriberService = subscriberService;
         }
         #endregion
 
@@ -58,24 +61,22 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         // Create/Add
         public async Task<int> AddAsync(UsageRecord usageRecord)
         {
+            // Get the subscriber (already validated by the validator)
+            var subscriber = await _subscriberService.GetByIdAsync(usageRecord.SubscriberId);
 
-            // At this point the validator has ALREADY checked:
-            // - Subscriber exists
-            // - Tariff exists for the (UsageType, IsRoaming, IsPeak)
+            // Set IsRoaming from subscriber table
+            usageRecord.IsRoaming = subscriber.IsRoaming;
 
-
-            // Force IsPeak calculation
+            // Calculate IsPeak from timestamp
             var hour = usageRecord.Timestamp.Hour;
             usageRecord.IsPeak = hour >= 8 && hour < 20;
 
-
-            // 1. Get the needed tariff to calculate pricing; assume always found
+            // Find matching tariff
             var tariff = await _tariffService.FindTariffAsync(
                 usageRecord.UsageType,
                 usageRecord.IsRoaming,
                 usageRecord.IsPeak);
 
-            // 2. Fill derived fields
             usageRecord.UnitPrice = tariff.PricePerUnit;
 
             usageRecord.TotalCost = usageRecord.UsageType switch
@@ -86,7 +87,6 @@ namespace TelecomBillingAndConsumption.Service.Implementation
                 _ => throw new Exception("Unknown UsageType.")
             };
 
-            // 3. Save to DB
             var result = await _usageRecordRepository.AddAsync(usageRecord);
             return result.Id;
         }

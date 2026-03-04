@@ -7,7 +7,7 @@ namespace TelecomBillingAndConsumption.Core.Mapping.UsageRecordMapping
         public UsageRecordProfile()
         {
             AddUsageRecordMapping();
-            GetUsageByIdMapping();
+            GetUsageRecordByIdMapping();
             GetUsageRecordsBySubscriberIdMapping();
             GetUsageSummaryBySubscriberIdMapping();
         }

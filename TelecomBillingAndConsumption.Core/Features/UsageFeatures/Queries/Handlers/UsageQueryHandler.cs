@@ -27,7 +27,8 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Queries.Handl
             IMapper mapper,
             IStringLocalizer<SharedResources> stringLocalizer) : base(stringLocalizer)
         {
-
+            _mapper = mapper;
+            _usageRecordService = usageRecordService;
             _localizer = stringLocalizer;
         }
         #endregion

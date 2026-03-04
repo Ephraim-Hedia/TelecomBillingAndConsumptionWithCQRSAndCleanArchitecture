@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using System.Text.Json.Serialization;
 using TelecomBillingAndConsumption.Core.Bases;
 using TelecomBillingAndConsumption.Data.Helpers;
 
@@ -8,6 +9,7 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Mode
     {
         public int SubscriberId { get; set; }
 
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public UsageType UsageType { get; set; }
 
         public int? CallMinutes { get; set; }
@@ -15,8 +17,6 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Mode
         public decimal? DataMB { get; set; }
 
         public int? SMSCount { get; set; }
-
-        public bool IsRoaming { get; set; }
 
         public DateTime Timestamp { get; set; }
     }

@@ -1,4 +1,4 @@
-﻿using TelecomBillingAndConsumption.Core.Features.UsageFeatures.Queries.Models;
+﻿using TelecomBillingAndConsumption.Core.Features.UsageFeatures.Queries.Results;
 using TelecomBillingAndConsumption.Data.Entities;
 
 namespace TelecomBillingAndConsumption.Core.Mapping.UsageRecordMapping
@@ -7,7 +7,9 @@ namespace TelecomBillingAndConsumption.Core.Mapping.UsageRecordMapping
     {
         public void GetUsageRecordsBySubscriberIdMapping()
         {
-            CreateMap<GetUsageRecordsBySubscriberIdQuery, UsageRecord>().ReverseMap();
+            CreateMap<UsageRecord, GetUsageRecordsBySubscriberIdResponse>()
+                .ForMember(dest => dest.SubscriberPhone,
+                           opt => opt.MapFrom(src => src.Subscriber.PhoneNumber));
         }
     }
 }

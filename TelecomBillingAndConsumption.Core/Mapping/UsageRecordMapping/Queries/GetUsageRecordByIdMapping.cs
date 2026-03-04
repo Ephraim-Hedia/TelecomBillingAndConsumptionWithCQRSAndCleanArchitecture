@@ -5,11 +5,11 @@ namespace TelecomBillingAndConsumption.Core.Mapping.UsageRecordMapping
 {
     public partial class UsageRecordProfile
     {
-        public void GetUsageSummaryBySubscriberIdMapping()
+        public void GetUsageRecordByIdMapping()
         {
-            CreateMap<GetUsageSummaryBySubscriberIdResponse, UsageRecord>()
-
-                .ReverseMap();
+            CreateMap<UsageRecord, GetUsageRecordByIdResponse>()
+                .ForMember(dest => dest.SubscriberPhone,
+                    opt => opt.MapFrom(src => src.Subscriber.PhoneNumber));
         }
     }
 }
