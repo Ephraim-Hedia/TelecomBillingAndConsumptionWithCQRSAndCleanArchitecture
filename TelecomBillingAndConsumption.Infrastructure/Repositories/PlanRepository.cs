@@ -9,6 +9,9 @@ namespace TelecomBillingAndConsumption.Infrastructure.Repositories
     {
         public PlanRepository(ApplicationDbContext context) : base(context)
         {
+
         }
     }
+
+
 }

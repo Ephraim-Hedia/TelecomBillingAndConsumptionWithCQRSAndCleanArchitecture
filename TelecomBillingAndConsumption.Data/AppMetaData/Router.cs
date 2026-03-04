@@ -34,6 +34,8 @@
             public const string create = prefix;
             public const string update = prefix + "{id}";
             public const string delete = prefix + "{id}";
+            public const string activate = prefix + "{id}/activate";
+            public const string deactivate = prefix + "{id}/deactivate";
         }
 
         public static class Subscribers

@@ -37,5 +37,19 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             var response = await Mediator.Send(new DeletePlanByIdCommand(id));
             return NewResult(response);
         }
+
+        [HttpPut(Router.PlansRouting.activate)]
+        public async Task<IActionResult> Activate([FromRoute] int id)
+        {
+            var response = await Mediator.Send(new ActivatePlanByIdCommand(id));
+            return NewResult(response);
+        }
+
+        [HttpPut(Router.PlansRouting.deactivate)]
+        public async Task<IActionResult> Deactivate([FromRoute] int id)
+        {
+            var response = await Mediator.Send(new DeactivatePlanByIdCommand(id));
+            return NewResult(response);
+        }
     }
 }

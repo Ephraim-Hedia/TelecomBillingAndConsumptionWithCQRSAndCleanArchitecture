@@ -14,5 +14,7 @@ namespace TelecomBillingAndConsumption.Service.Interfaces.PlanService
         Task<bool> UpdateAsync(Plan plan);
         Task<bool> DeleteAsync(int id);
         public IQueryable<Plan> GetPlansAsQuarable();
+        Task<bool> ActivateAsync(int id);
+        Task<bool> DeactivateAsync(int id);
     }
 }

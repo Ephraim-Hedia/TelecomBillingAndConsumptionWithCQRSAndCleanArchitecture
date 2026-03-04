@@ -12,7 +12,9 @@ namespace TelecomBillingAndConsumption.Core.Features.PlansFeatures.Commands.Hand
     public class PlansCommandHandler : ResponseHandler,
         IRequestHandler<AddPlanCommand, Response<int>>,
         IRequestHandler<UpdatePlanByIdCommand, Response<string>>,
-        IRequestHandler<DeletePlanByIdCommand, Response<string>>
+        IRequestHandler<DeletePlanByIdCommand, Response<string>>,
+        IRequestHandler<ActivatePlanByIdCommand, Response<string>>,
+        IRequestHandler<DeactivatePlanByIdCommand, Response<string>>
     {
         #region Fields
         private readonly IPlanService _planService;
@@ -57,6 +59,23 @@ namespace TelecomBillingAndConsumption.Core.Features.PlansFeatures.Commands.Hand
             var result = await _planService.DeleteAsync(request.Id);
             return result
                 ? Deleted<string>(_localizer[SharedResourcesKeys.Deleted])
+                : NotFound<string>(_localizer[SharedResourcesKeys.NotFound]);
+        }
+
+
+        public async Task<Response<string>> Handle(ActivatePlanByIdCommand request, CancellationToken cancellationToken)
+        {
+            var success = await _planService.ActivateAsync(request.Id);
+            return success
+                ? Success("Plan activated successfully.")
+                : NotFound<string>(_localizer[SharedResourcesKeys.NotFound]);
+        }
+
+        public async Task<Response<string>> Handle(DeactivatePlanByIdCommand request, CancellationToken cancellationToken)
+        {
+            var success = await _planService.DeactivateAsync(request.Id);
+            return success
+                ? Success("Plan deactivated successfully.")
                 : NotFound<string>(_localizer[SharedResourcesKeys.NotFound]);
         }
         #endregion

@@ -60,6 +60,26 @@ namespace TelecomBillingAndConsumption.Service.Implementation.PlanService
             return _planRepository.GetTableNoTracking()
                 .Where(p => !p.IsDeleted && p.IsActive);
         }
+
+        public async Task<bool> ActivateAsync(int id)
+        {
+            var plan = await _planRepository.GetByIdAsync(id);
+            if (plan == null || plan.IsDeleted) return false;
+            plan.IsActive = true;
+            plan.UpdatedAt = DateTime.UtcNow;
+            await _planRepository.UpdateAsync(plan);
+            return true;
+        }
+
+        public async Task<bool> DeactivateAsync(int id)
+        {
+            var plan = await _planRepository.GetByIdAsync(id);
+            if (plan == null || plan.IsDeleted) return false;
+            plan.IsActive = false;
+            plan.UpdatedAt = DateTime.UtcNow;
+            await _planRepository.UpdateAsync(plan);
+            return true;
+        }
         #endregion
     }
 }

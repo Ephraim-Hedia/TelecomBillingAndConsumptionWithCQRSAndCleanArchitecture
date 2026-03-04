@@ -28,6 +28,9 @@
         public const string UserNameIsNotExist = "UserNameIsNotExist";
         public const string PasswordNotCorrect = "PasswordNotCorrect";
         public const string InvalidCredentials = "InvalidCredentials";
+        public const string PlanActivated = "PlanActivated";
+        public const string PlanDeactivated = "PlanDeactivated";
+
 
         public const string AlgorithmIsWrong = "AlgorithmIsWrong";
         public const string TokenIsNotExpired = "TokenIsNotExpired";
