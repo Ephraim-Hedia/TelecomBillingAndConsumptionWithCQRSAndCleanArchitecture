@@ -126,5 +126,8 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
         public async Task<Bill> GetBillAsync(int billId)
             => await _billRepository.GetByIdWithIncludesAsync(billId);
+
+
+
     }
 }

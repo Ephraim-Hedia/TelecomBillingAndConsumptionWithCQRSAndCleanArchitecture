@@ -32,10 +32,10 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             return Ok(await Mediator.Send(query));
         }
         [HttpGet]
-        [Route(Router.DashboardRouting.getTopCustomersPaginated)]
-        public async Task<IActionResult> GetTopCustomersPaginated([FromQuery] GetDashboardTopCustomersPaginatedQuery query)
+        [Route(Router.DashboardRouting.getTopCustomers)]
+        public async Task<IActionResult> GetTopCustomersPaginated([FromQuery] int topN = 10)
         {
-            var result = await Mediator.Send(query);
+            var result = await Mediator.Send(new GetDashboardTopCustomersQuery() { TopN = topN });
             return Ok(result);
         }
     }

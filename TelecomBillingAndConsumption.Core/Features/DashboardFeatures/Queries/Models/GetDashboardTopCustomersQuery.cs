@@ -1,10 +1,11 @@
 ﻿using MediatR;
+using TelecomBillingAndConsumption.Core.Bases;
 using TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Results;
 
 namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Models
 {
-    public class GetDashboardTopCustomersPaginatedQuery : IRequest<List<GetDashboardTopCustomersPaginatedResponse>>
+    public class GetDashboardTopCustomersQuery : IRequest<Response<List<GetDashboardTopCustomersResponse>>>
     {
-        public int Limit { get; set; } = 10;
+        public int TopN { get; set; }
     }
 }

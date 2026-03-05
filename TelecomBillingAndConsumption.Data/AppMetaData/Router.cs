@@ -88,10 +88,10 @@
 
         public static class DashboardRouting
         {
-            public const string prefix = baseRoute + "dashboard/";
+            public const string prefix = baseRoute + "statistics/";
             public const string getOverview = prefix + "overview";
             public const string getRevenue = prefix + "revenue";
-            public const string getTopCustomersPaginated = prefix + "topCustomers/paginated";
+            public const string getTopCustomers = prefix + "top-customers";
             public const string getUsageStatistics = prefix + "usageStatistics";
         }
 

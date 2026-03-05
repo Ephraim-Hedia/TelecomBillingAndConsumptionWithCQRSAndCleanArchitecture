@@ -8,5 +8,6 @@ namespace TelecomBillingAndConsumption.Service.Interfaces
         public Task<Bill> GetBillAsync(int billId);
         public IQueryable<Bill> GetAllBillsBySubsriberIdQuarable(int subscriberId);
         public Task<Bill> GetAllBillsBySubsriberIdAndMonthAsync(int subscriberId, string month);
+
     }
 }

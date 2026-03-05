@@ -1,9 +1,11 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.Extensions.Localization;
 using TelecomBillingAndConsumption.Core.Bases;
 using TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Models;
 using TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Results;
 using TelecomBillingAndConsumption.Core.Resources;
+using TelecomBillingAndConsumption.Service.Interfaces;
 
 namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Handlers
 {
@@ -11,15 +13,22 @@ namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.H
         IRequestHandler<GetDashboardOverviewQuery, Response<GetDashboardOverviewResponse>>,
         IRequestHandler<GetDashboardRevenueQuery, Response<GetDashboardRevenueResponse>>,
         IRequestHandler<GetUsageStatisticsQuery, Response<UsageStatisticsResponse>>,
-        IRequestHandler<GetDashboardTopCustomersPaginatedQuery, List<GetDashboardTopCustomersPaginatedResponse>>
+        IRequestHandler<GetDashboardTopCustomersQuery, Response<List<GetDashboardTopCustomersResponse>>>
     {
 
         #region Fields
         private readonly IStringLocalizer<SharedResources> _localizer;
+        private readonly IDashboardService _dashboardService;
+        private readonly IMapper _mapper;
         #endregion
         #region Constructor
-        public DashboardQueryHandler(IStringLocalizer<SharedResources> localizer) : base(localizer)
+        public DashboardQueryHandler(
+            IDashboardService dashboardService,
+            IMapper mapper,
+            IStringLocalizer<SharedResources> localizer) : base(localizer)
         {
+            _mapper = mapper;
+            _dashboardService = dashboardService;
             _localizer = localizer;
         }
 
@@ -38,9 +47,11 @@ namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.H
             throw new NotImplementedException();
         }
 
-        public Task<List<GetDashboardTopCustomersPaginatedResponse>> Handle(GetDashboardTopCustomersPaginatedQuery request, CancellationToken cancellationToken)
+        public async Task<Response<List<GetDashboardTopCustomersResponse>>> Handle(GetDashboardTopCustomersQuery request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var result = await _dashboardService.GetTopCustomersAsync(request.TopN);
+            var mappedResponse = _mapper.Map<List<GetDashboardTopCustomersResponse>>(result);
+            return Success(mappedResponse);
         }
         #endregion
     }
