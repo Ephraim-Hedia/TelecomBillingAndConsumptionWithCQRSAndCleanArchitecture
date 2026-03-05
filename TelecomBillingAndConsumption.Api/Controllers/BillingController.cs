@@ -9,13 +9,6 @@ namespace TelecomBillingAndConsumption.Api.Controllers
     [ApiController]
     public class BillingController : AppControllerBase
     {
-        [HttpGet(Router.BillingRouting.getAllPaginated)]
-        public async Task<IActionResult> GetAllPaginated([FromQuery] GetAllBillingsBySubscriberIdQuery query)
-        {
-            var result = await Mediator.Send(query);
-            return Ok(result);
-        }
-
         [HttpPost]
         [Route(Router.BillingRouting.create)]
         public async Task<IActionResult> Create([FromBody] AddBillingToSubscriberIdCommand command)
@@ -23,6 +16,13 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             var result = await Mediator.Send(command);
             return NewResult(result);
         }
+        [HttpGet(Router.BillingRouting.getAllPaginated)]
+        public async Task<IActionResult> GetAllPaginated([FromQuery] GetAllBillingsBySubscriberIdQuery query)
+        {
+            var result = await Mediator.Send(query);
+            return Ok(result);
+        }
+
         // GetBillByIdQuery
         [HttpGet]
         [Route(Router.BillingRouting.getById)]

@@ -167,7 +167,6 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             decimal totalCost = (normalUnits * unitPrice) + (overageUnits * unitPrice * 2);
             return totalCost;
         }
-
         #endregion
     }
 }

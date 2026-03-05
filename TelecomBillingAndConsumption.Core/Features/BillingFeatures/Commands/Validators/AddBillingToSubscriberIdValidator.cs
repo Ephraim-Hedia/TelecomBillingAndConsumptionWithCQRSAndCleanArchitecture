@@ -23,10 +23,10 @@ namespace TelecomBillingAndConsumption.Core.Features.BillingFeatures.Commands.Va
         {
             RuleFor(x => x.SubscriberId)
                 .GreaterThan(0).WithMessage("Subscriber Id must be greater than 0.");
-            RuleFor(x => x.Month)
-                .InclusiveBetween(1, 12).WithMessage("Month must be between 1 and 12.");
-            RuleFor(x => x.Year)
-                .GreaterThan(0).WithMessage("Year must be greater than 0.");
+            //RuleFor(x => x.Month)
+            //    .InclusiveBetween(1, 12).WithMessage("Month must be between 1 and 12.");
+            //RuleFor(x => x.Year)
+            //    .GreaterThan(0).WithMessage("Year must be greater than 0.");
         }
 
         public void ApplyCustomValidationsRules()

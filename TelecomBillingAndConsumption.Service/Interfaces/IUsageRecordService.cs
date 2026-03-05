@@ -10,5 +10,6 @@ namespace TelecomBillingAndConsumption.Service.Interfaces
         Task<UsageRecord?> GetByIdAsync(int id);
         Task<int> AddAsync(UsageRecord usageRecord);
         Task<bool> DeleteAsync(int id);
+
     }
 }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
 
@@ -11,9 +12,11 @@ using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
 namespace TelecomBillingAndConsumption.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260305144404_editinbill2")]
+    partial class editinbill2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,7 +256,10 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("UsageRecordId")
+                    b.Property<int>("UsageRecordId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("UsageRecordId1")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -262,6 +268,8 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("UsageRecordId");
+
+                    b.HasIndex("UsageRecordId1");
 
                     b.ToTable("BillDetails", (string)null);
                 });
@@ -682,11 +690,19 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TelecomBillingAndConsumption.Data.Entities.UsageRecord", "UsageRecord")
+                        .WithMany()
+                        .HasForeignKey("UsageRecordId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("TelecomBillingAndConsumption.Data.Entities.UsageRecord", null)
                         .WithMany("BillDetails")
-                        .HasForeignKey("UsageRecordId");
+                        .HasForeignKey("UsageRecordId1");
 
                     b.Navigation("Bill");
+
+                    b.Navigation("UsageRecord");
                 });
 
             modelBuilder.Entity("TelecomBillingAndConsumption.Data.Entities.Subscriber", b =>

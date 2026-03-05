@@ -7,8 +7,7 @@ namespace TelecomBillingAndConsumption.Core.Features.BillingFeatures.Commands.Mo
     {
         public int SubscriberId { get; set; }
 
-        public int Month { get; set; }
+        public string Month { get; set; }
 
-        public int Year { get; set; }
     }
 }

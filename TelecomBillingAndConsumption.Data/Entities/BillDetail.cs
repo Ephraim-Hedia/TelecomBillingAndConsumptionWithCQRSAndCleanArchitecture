@@ -10,7 +10,5 @@
 
         // Navigation
         public Bill Bill { get; set; } = null!;
-
-        public UsageRecord UsageRecord { get; set; } = null!;
     }
 }

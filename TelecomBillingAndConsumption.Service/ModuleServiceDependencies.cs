@@ -21,6 +21,12 @@ namespace TelecomBillingAndConsumption.Service
             // Plan Limit Service 
             services.AddScoped<IPlanLimitService, PlanLimitService>();
 
+            // Usage Summary Service
+            services.AddScoped<IUsageSummaryService, UsageSummaryService>();
+
+            // Bill Service
+            services.AddScoped<IBillService, BillService>();
+
             services.AddScoped<IAuthenticationService, AuthenticationService>();
             return services;
         }

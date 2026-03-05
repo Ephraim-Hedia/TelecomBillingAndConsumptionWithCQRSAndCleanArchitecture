@@ -32,10 +32,10 @@ namespace TelecomBillingAndConsumption.Infrastructure.Configuration
                 .HasForeignKey<BillDetail>(d => d.BillId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(b => b.Payment)
-                .WithOne(p => p.Bill)
-                .HasForeignKey<Payment>(p => p.BillId)
-                .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasOne(b => b.Payment)
+            //    .WithOne(p => p.Bill)
+            //    .HasForeignKey<Payment>(p => p.BillId)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             builder.Property(b => b.RowVersion)
                 .IsRowVersion();

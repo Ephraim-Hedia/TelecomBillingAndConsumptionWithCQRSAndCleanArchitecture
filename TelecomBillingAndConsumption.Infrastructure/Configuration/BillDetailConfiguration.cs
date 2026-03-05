@@ -22,10 +22,7 @@ namespace TelecomBillingAndConsumption.Infrastructure.Configuration
                 .HasForeignKey<BillDetail>(d => d.BillId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(d => d.UsageRecord)
-                .WithMany() // If UsageRecord does NOT track BillDetail directly.
-                .HasForeignKey("UsageRecordId")
-                .OnDelete(DeleteBehavior.Restrict);
+
 
             builder.HasQueryFilter(bd => !bd.IsDeleted);
         }

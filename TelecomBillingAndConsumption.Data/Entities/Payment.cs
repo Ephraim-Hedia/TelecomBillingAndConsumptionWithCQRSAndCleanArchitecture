@@ -2,7 +2,7 @@
 {
     public class Payment : BaseEntity
     {
-        public int BillId { get; set; }
+        //public int BillId { get; set; }
 
         public decimal Amount { get; set; }
 
@@ -15,6 +15,6 @@
         public string Status { get; set; } = string.Empty;
 
         // Navigation
-        public Bill Bill { get; set; } = null!;
+        //public Bill Bill { get; set; } = null!;
     }
 }

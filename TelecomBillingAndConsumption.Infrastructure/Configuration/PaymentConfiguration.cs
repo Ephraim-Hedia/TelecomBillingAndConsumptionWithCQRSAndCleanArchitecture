@@ -22,9 +22,9 @@ namespace TelecomBillingAndConsumption.Infrastructure.Configuration
             builder.Property(p => p.TransactionId)
                 .HasMaxLength(150);
 
-            builder.HasOne(p => p.Bill)
-                .WithOne(b => b.Payment)
-                .OnDelete(DeleteBehavior.Restrict);
+            //builder.HasOne(p => p.Bill)
+            //    .WithOne(b => b.Payment)
+            //    .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasQueryFilter(p => !p.IsDeleted);
         }
