@@ -23,9 +23,8 @@ namespace TelecomBillingAndConsumption.Infrastructure.Configuration
                 .HasMaxLength(150);
 
             builder.HasOne(p => p.Bill)
-                .WithMany(b => b.Payments)
-                .HasForeignKey(p => p.BillId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .WithOne(b => b.Payment)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasQueryFilter(p => !p.IsDeleted);
         }

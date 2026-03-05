@@ -4,9 +4,7 @@
     {
         public int SubscriberId { get; set; }
 
-        public int BillingMonth { get; set; }
-
-        public int BillingYear { get; set; }
+        public string Month { get; set; } // Format "YYYY-MM"
 
         public decimal PlanFee { get; set; }
 
@@ -16,9 +14,9 @@
 
         public decimal ExtraUsageCost { get; set; }
 
-        public decimal VatAmount { get; set; }
-
         public decimal LoyaltyDiscount { get; set; }
+
+        public decimal VatAmount { get; set; }
 
         public decimal TotalAmount { get; set; }
 
@@ -27,8 +25,8 @@
         // Navigation
         public Subscriber Subscriber { get; set; } = null!;
 
-        public ICollection<BillDetail> BillDetails { get; set; } = new HashSet<BillDetail>();
+        public BillDetail BillDetail { get; set; }
 
-        public ICollection<Payment> Payments { get; set; } = new HashSet<Payment>();
+        public Payment Payment { get; set; } = null!;
     }
 }

@@ -10,22 +10,21 @@ namespace TelecomBillingAndConsumption.Infrastructure.Configuration
         {
             builder.ToTable("BillDetails");
 
-            builder.HasKey(bd => bd.Id);
+            builder.HasKey(d => d.Id);
 
-            builder.Property(bd => bd.CallCost).HasPrecision(18, 2);
-            builder.Property(bd => bd.DataCost).HasPrecision(18, 2);
-            builder.Property(bd => bd.SmsCost).HasPrecision(18, 2);
-            builder.Property(bd => bd.ExtraCharge).HasPrecision(18, 2);
-            builder.Property(bd => bd.RoamingCharge).HasPrecision(18, 2);
+            builder.Property(d => d.PeakCalls).IsRequired();
+            builder.Property(d => d.OffPeakCalls).IsRequired();
+            builder.Property(d => d.DataMB).HasColumnType("decimal(18,2)").IsRequired();
+            builder.Property(d => d.Sms).IsRequired();
 
-            builder.HasOne(bd => bd.Bill)
-                .WithMany(b => b.BillDetails)
-                .HasForeignKey(bd => bd.BillId)
+            builder.HasOne(d => d.Bill)
+                .WithOne(b => b.BillDetail)
+                .HasForeignKey<BillDetail>(d => d.BillId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(bd => bd.UsageRecord)
-                .WithMany(u => u.BillDetails)
-                .HasForeignKey(bd => bd.UsageRecordId)
+            builder.HasOne(d => d.UsageRecord)
+                .WithMany() // If UsageRecord does NOT track BillDetail directly.
+                .HasForeignKey("UsageRecordId")
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasQueryFilter(bd => !bd.IsDeleted);
