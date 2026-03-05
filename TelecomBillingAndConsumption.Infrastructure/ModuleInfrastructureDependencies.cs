@@ -13,6 +13,7 @@ namespace TelecomBillingAndConsumption.Infrastructure
             services.AddScoped<IPlanRepository, PlanRepository>();
             services.AddScoped<ISubscriberRepository, SubscriberRepository>();
             services.AddScoped<IBillRepository, BillRepository>();
+            services.AddScoped<IUsageRecordRepository, UsageRecordRepository>();
 
             return services;
         }

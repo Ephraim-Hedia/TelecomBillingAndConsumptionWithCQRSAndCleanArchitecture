@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using TelecomBillingAndConsumption.Data.Helpers;
 using TelecomBillingAndConsumption.Infrastructure.Interfaces;
 using TelecomBillingAndConsumption.Service.HelperDtos;
 using TelecomBillingAndConsumption.Service.Interfaces;
@@ -8,9 +9,13 @@ namespace TelecomBillingAndConsumption.Service.Implementation
     public class DashboardService : IDashboardService
     {
         private readonly IBillRepository _billRepository;
-        public DashboardService(IBillRepository billRepository)
+        private readonly IUsageRecordRepository _usageRecordRepository;
+        public DashboardService(
+            IUsageRecordRepository usageRecordRepository,
+            IBillRepository billRepository)
         {
             _billRepository = billRepository;
+            _usageRecordRepository = usageRecordRepository;
         }
         public async Task<List<TopCustomerDto>> GetTopCustomersAsync(int topN)
         {
@@ -57,6 +62,39 @@ namespace TelecomBillingAndConsumption.Service.Implementation
                 TotalRevenue = totalRevenue,
                 PaidBills = paidBills,
                 UnpaidBills = unpaidBills
+            };
+        }
+
+        public async Task<UsageStatistics> GetUsageStatisticsAsync(int month, int year)
+        {
+            var periodStart = new DateTime(year, month, 1);
+            var periodEnd = periodStart.AddMonths(1);
+
+            var usageRecords = _usageRecordRepository.QueryWithIncludes()
+                .Where(r => r.Timestamp >= periodStart && r.Timestamp < periodEnd);
+
+            var totalCallMinutes = await usageRecords
+                .Where(r => r.UsageType == UsageType.Call)
+                .SumAsync(r => r.CallMinutes ?? 0);
+
+            var totalDataMB = await usageRecords
+                .Where(r => r.UsageType == UsageType.Data)
+                .SumAsync(r => r.DataMB ?? 0m);
+
+            var totalSMS = await usageRecords
+                .Where(r => r.UsageType == UsageType.SMS)
+                .SumAsync(r => r.SMSCount ?? 0);
+
+            // If you store cost per usage, aggregate accordingly,
+            // Otherwise, calculate cost using linked Tariff.
+            var totalUsageCost = await usageRecords.SumAsync(r => r.TotalCost);
+
+            return new UsageStatistics
+            {
+                TotalCallMinutes = totalCallMinutes,
+                TotalDataMB = totalDataMB,
+                TotalSMS = totalSMS,
+                TotalUsageCost = totalUsageCost
             };
         }
     }

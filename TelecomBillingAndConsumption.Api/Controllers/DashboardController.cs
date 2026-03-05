@@ -21,15 +21,15 @@ namespace TelecomBillingAndConsumption.Api.Controllers
 
         [HttpGet]
         [Route(Router.DashboardRouting.getRevenue)]
-        public async Task<IActionResult> GetDashboardRevenue([FromQuery] int month, [FromQuery] int Year)
+        public async Task<IActionResult> GetDashboardRevenue([FromQuery] int month, [FromQuery] int year)
         {
-            return Ok(await Mediator.Send(new GetDashboardRevenueQuery() { Month = month, Year = Year }));
+            return Ok(await Mediator.Send(new GetDashboardRevenueQuery() { Month = month, Year = year }));
         }
         [HttpGet]
         [Route(Router.DashboardRouting.getUsageStatistics)]
-        public async Task<IActionResult> GetUsageStatistics(GetUsageStatisticsQuery query)
+        public async Task<IActionResult> GetUsageStatistics([FromQuery] int month, [FromQuery] int year)
         {
-            return Ok(await Mediator.Send(query));
+            return Ok(await Mediator.Send(new GetUsageStatisticsQuery() { Month = month, Year = year }));
         }
         [HttpGet]
         [Route(Router.DashboardRouting.getTopCustomers)]
