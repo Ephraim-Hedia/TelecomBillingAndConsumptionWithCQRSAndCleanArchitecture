@@ -15,7 +15,7 @@ namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Queries
     public class SubscriberQueryHandler : ResponseHandler,
         IRequestHandler<GetAllSubscribersPaginatedQuery, PaginatedResult<GetAllSubscribersPaginatedResponse>>,
         IRequestHandler<GetSubscriberByIdQuery, Response<GetSubscriberByIdResponse>>,
-        IRequestHandler<GetSubscriberUsageSummaryQuery, SubscriberUsageSummaryResponse>
+        IRequestHandler<GetSubscriberUsageSummaryQuery, Response<SubscriberUsageSummaryResponse>>
     {
         #region Fields
         private readonly ISubscriberService _subscriberService;
@@ -65,11 +65,17 @@ namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Queries
             return Success(response);
         }
 
-        public async Task<SubscriberUsageSummaryResponse> Handle(GetSubscriberUsageSummaryQuery request, CancellationToken cancellationToken)
+        public async Task<Response<SubscriberUsageSummaryResponse>> Handle(GetSubscriberUsageSummaryQuery request, CancellationToken cancellationToken)
         {
             // Load subscriber and plan
             var subscriber = await _subscriberService.GetByIdAsync(request.SubscriberId);
+            if (subscriber == null)
+                return NotFound<SubscriberUsageSummaryResponse>(_localizer[SharedResourcesKeys.NotFound]);
+
+
             var plan = await _planService.GetByIdAsync(subscriber.PlanId);
+            if (plan == null)
+                return BadRequest<SubscriberUsageSummaryResponse>(_localizer[SharedResourcesKeys.UnprocessableEntity]);
 
             // Compute current period (month)
             var now = DateTime.UtcNow;
@@ -146,7 +152,7 @@ namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Queries
                 PeriodEnd = periodEnd,
             };
 
-            return response;
+            return Success<SubscriberUsageSummaryResponse>(response);
         }
         #endregion
     }
