@@ -1,4 +1,5 @@
-﻿using TelecomBillingAndConsumption.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TelecomBillingAndConsumption.Data.Entities;
 using TelecomBillingAndConsumption.Infrastructure.Interfaces;
 using TelecomBillingAndConsumption.Service.Interfaces;
 using TelecomBillingAndConsumption.Service.Interfaces.PlanService;
@@ -26,6 +27,14 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
         public async Task<int> GenerateMonthlyBillAsync(int subscriberId, string month)
         {
+
+            // Check if bill already exists for this subscriber/month
+            var existingBill = await _billRepository.GetBillsBySubscriberIdQuarable(subscriberId)
+                .FirstOrDefaultAsync(b => b.SubscriberId == subscriberId && b.Month == month);
+
+            if (existingBill != null)
+                throw new InvalidOperationException("Bill already generated for this subscriber and month.");
+
             // 1. Compute billing period (e.g., month "2026-03")
             var periodStart = DateTime.Parse($"{month}-01");
             var periodEnd = periodStart.AddMonths(1);
@@ -109,6 +118,10 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         public IQueryable<Bill> GetAllBillsBySubsriberIdQuarable(int subscriberId)
         {
             return _billRepository.GetBillsBySubscriberIdQuarable(subscriberId);
+        }
+        public async Task<Bill> GetAllBillsBySubsriberIdAndMonthAsync(int subscriberId, string month)
+        {
+            return await _billRepository.GetBillsBySubscriberIdQuarable(subscriberId).FirstOrDefaultAsync(b => b.Month == month);
         }
 
         public async Task<Bill> GetBillAsync(int billId)

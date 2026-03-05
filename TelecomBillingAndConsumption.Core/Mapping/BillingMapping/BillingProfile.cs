@@ -8,6 +8,7 @@ namespace TelecomBillingAndConsumption.Core.Mapping.BillingMapping
         {
             GetBillByIdMapping();
             GetAllBillingsBySubscriberIdMapping();
+            GetBillBySubscriberIdAndMonthMapping();
         }
     }
 }

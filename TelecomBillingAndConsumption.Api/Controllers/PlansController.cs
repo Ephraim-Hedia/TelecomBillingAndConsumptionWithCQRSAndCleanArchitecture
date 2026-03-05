@@ -11,12 +11,24 @@ namespace TelecomBillingAndConsumption.Api.Controllers
     {
         [HttpGet(Router.PlansRouting.getAllPaginated)]
         public async Task<IActionResult> GetAllPaginated()
-            => Ok(await Mediator.Send(new GetAllPlansPaginatedQuery()));
+        {
+            var result = await Mediator.Send(new GetAllPlansPaginatedQuery());
+            return Ok(result);
+        }
 
 
         [HttpGet(Router.PlansRouting.getById)]
-        public async Task<IActionResult> GetById(int id)
-            => Ok(await Mediator.Send(new GetPlanByIdQuery(id)));
+        public async Task<IActionResult> GetById(int id, [FromQuery] string responseFormat = "json")
+        {
+            var result = await Mediator.Send(new GetPlanByIdQuery(id));
+            if (responseFormat.ToLower() == "soap" || responseFormat.ToLower() == "xml")
+            {
+                var xml = SerializeToSoap.Serialize(result); // Or standard xml
+                return Content(xml, "application/soap+xml");
+            }
+            return Ok(result);
+        }
+
 
 
         [HttpPost(Router.PlansRouting.create)]

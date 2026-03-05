@@ -13,7 +13,10 @@ namespace TelecomBillingAndConsumption.Api.Controllers
 
         [HttpGet(Router.Subscribers.getAllPaginated)]
         public async Task<IActionResult> GetAllPaginated([FromQuery] GetAllSubscribersPaginatedQuery query)
-        => Ok(await Mediator.Send(query));
+        {
+            var result = await Mediator.Send(query);
+            return Ok(result);
+        }
 
         [HttpGet(Router.Subscribers.getById)]
         public async Task<IActionResult> GetById(int id)
@@ -44,7 +47,15 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             => NewResult(await Mediator.Send(new DeactivateSubscriberByIdCommand(id)));
 
         [HttpGet(Router.Subscribers.SubscriberUsageSummary)]
-        public async Task<IActionResult> GetByIdSubscriberUsageSummary(int id)
-        => Ok(await Mediator.Send(new GetSubscriberUsageSummaryQuery(id)));
+        public async Task<IActionResult> GetByIdSubscriberUsageSummary(int id, [FromQuery] string responseFormat = "json")
+        {
+            var result = await Mediator.Send(new GetSubscriberUsageSummaryQuery(id));
+            if (responseFormat.ToLower() == "soap" || responseFormat.ToLower() == "xml")
+            {
+                var xml = SerializeToSoap.Serialize(result); // Or standard xml
+                return Content(xml, "application/soap+xml");
+            }
+            return Ok(result);
+        }
     }
 }

@@ -70,9 +70,11 @@
             public const string getAll = prefix;
             public const string getAllPaginated = prefix + "Paginated";
             public const string getById = prefix + "{id}";
+            public const string getBySubscriberId = prefix + "subscriber/{subscriberId}";
+            public const string getBySubscriberIdAndMonth = prefix + "subscriber/{subscriberId}/{month}";
             public const string getBillingHistoryForSubscriber = prefix + "subscriber/{subscriberId}/history";
             public const string getBillingDetailsByBillId = prefix + "{billId}/details";
-            public const string getAllBillingsBySubscriberId = prefix + "subscriber/{subscriberId}/all";
+            public const string getAllBillingsBySubscriberId = prefix + "{subscriberId}/all";
             public const string create = prefix;
             public const string update = prefix + "{id}";
             public const string delete = prefix + "{id}";

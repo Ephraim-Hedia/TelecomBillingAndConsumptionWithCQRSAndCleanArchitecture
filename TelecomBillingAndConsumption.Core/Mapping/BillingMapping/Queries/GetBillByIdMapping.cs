@@ -9,7 +9,8 @@ namespace TelecomBillingAndConsumption.Core.Mapping.BillingMapping
         {
 
             CreateMap<Bill, GetBillByIdResponse>()
-                .ForMember(dest => dest.BillDetails, opt => opt.MapFrom(src => src.BillDetail));
+                .ForMember(dest => dest.BillDetails, opt => opt.MapFrom(src => src.BillDetail))
+                .ForMember(dest => dest.BillId, opt => opt.MapFrom(src => src.Id));
 
             CreateMap<BillDetail, BillDetailsResponse>();
         }

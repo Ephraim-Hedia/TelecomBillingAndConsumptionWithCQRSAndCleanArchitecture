@@ -16,19 +16,31 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             var result = await Mediator.Send(command);
             return NewResult(result);
         }
-        [HttpGet(Router.BillingRouting.getAllPaginated)]
-        public async Task<IActionResult> GetAllPaginated([FromQuery] GetAllBillingsBySubscriberIdQuery query)
+        [HttpGet(Router.BillingRouting.getBySubscriberId)]
+        public async Task<IActionResult> GetAllPaginated(int subscriberId)
         {
-            var result = await Mediator.Send(query);
+            var result = await Mediator.Send(new GetAllBillingsBySubscriberIdQuery() { SubscriberId = subscriberId });
             return Ok(result);
         }
+
+        [HttpGet(Router.BillingRouting.getBySubscriberIdAndMonth)]
+        public async Task<IActionResult> GetBySubscriberIdAndMonth(int subscriberId, string month)
+        {
+            var result = await Mediator.Send(new GetBillBySubscriberIdAndMonthQuery() { SubscriberId = subscriberId, Month = month });
+            return Ok(result);
+        }
+
         // GetBillByIdQuery
         [HttpGet]
         [Route(Router.BillingRouting.getById)]
-        public async Task<IActionResult> GetById([FromRoute] int id)
+        public async Task<IActionResult> GetById([FromRoute] int id, [FromQuery] string responseFormat = "json")
         {
-
             var result = await Mediator.Send(new GetBillByIdQuery() { BillId = id });
+            if (responseFormat.ToLower() == "soap" || responseFormat.ToLower() == "xml")
+            {
+                var xml = SerializeToSoap.Serialize(result); // Or standard xml
+                return Content(xml, "application/soap+xml");
+            }
             return NewResult(result);
         }
         // GetBillingDetailsByBillIdQuery
@@ -39,5 +51,7 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             var result = await Mediator.Send(query);
             return Ok(result);
         }
+
+
     }
 }

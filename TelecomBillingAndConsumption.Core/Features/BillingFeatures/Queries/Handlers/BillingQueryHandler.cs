@@ -13,7 +13,9 @@ namespace TelecomBillingAndConsumption.Core.Features.BillingFeatures.Queries.Han
     public class BillingQueryHandler : ResponseHandler,
         IRequestHandler<GetBillByIdQuery, Response<GetBillByIdResponse>>,
         IRequestHandler<GetBillingDetailsByBillIdQuery, List<GetBillingDetailsByBillIdResponse>>,
-        IRequestHandler<GetAllBillingsBySubscriberIdQuery, PaginatedResult<GetAllBillingsBySubscriberIdResponse>>
+        IRequestHandler<GetAllBillingsBySubscriberIdQuery, PaginatedResult<GetAllBillingsBySubscriberIdResponse>>,
+        IRequestHandler<GetBillBySubscriberIdAndMonthQuery, Response<GetBillBySubscriberIdAndMonthResponse>>
+
 
     {
         #region Fields
@@ -60,6 +62,17 @@ namespace TelecomBillingAndConsumption.Core.Features.BillingFeatures.Queries.Han
             var paginatedList = await _mapper.ProjectTo<GetAllBillingsBySubscriberIdResponse>(billsQuarable)
                 .ToPaginatedListAsync(request.PageNumber, request.PageSize);
             return paginatedList;
+        }
+
+        public async Task<Response<GetBillBySubscriberIdAndMonthResponse>> Handle(GetBillBySubscriberIdAndMonthQuery request, CancellationToken cancellationToken)
+        {
+            var bill = await _billService.GetAllBillsBySubsriberIdAndMonthAsync(request.SubscriberId, request.Month);
+            if (bill == null)
+            {
+                return NotFound<GetBillBySubscriberIdAndMonthResponse>(_localizer[SharedResourcesKeys.NotFound]);
+            }
+            var mappedbill = _mapper.Map<GetBillBySubscriberIdAndMonthResponse>(bill);
+            return Success(mappedbill);
         }
         #endregion
 
