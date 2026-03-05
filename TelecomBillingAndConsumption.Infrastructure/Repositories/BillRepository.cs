@@ -14,10 +14,24 @@ namespace TelecomBillingAndConsumption.Infrastructure.Repositories
             _context = dbContext;
         }
 
+        public IQueryable<Bill> GetBillsBySubscriberIdQuarable(int subscriberId)
+            => _context.Bills
+                .Where(b => b.SubscriberId == subscriberId && !b.IsDeleted);
+
+
         public async Task<Bill> GetByIdWithIncludesAsync(int billId)
             => await _context.Bills
                 .Include(b => b.BillDetail)
                 .FirstOrDefaultAsync(b => b.Id == billId);
+
+
+        public IQueryable<Bill> QueryWithIncludes()
+        {
+            return GetTableNoTracking()
+            .Include(s => s.BillDetail)
+            .Include(s => s.Subscriber)
+            .Where(s => !s.IsDeleted);  // Add more Includes if needed
+        }
 
     }
 }

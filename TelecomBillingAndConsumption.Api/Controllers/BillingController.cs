@@ -22,29 +22,19 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             var result = await Mediator.Send(query);
             return Ok(result);
         }
-
         // GetBillByIdQuery
         [HttpGet]
         [Route(Router.BillingRouting.getById)]
-        public async Task<IActionResult> GetById([FromRoute] GetBillByIdQuery query)
+        public async Task<IActionResult> GetById([FromRoute] int id)
         {
-            var result = await Mediator.Send(query);
+
+            var result = await Mediator.Send(new GetBillByIdQuery() { BillId = id });
             return NewResult(result);
         }
         // GetBillingDetailsByBillIdQuery
         [HttpGet]
         [Route(Router.BillingRouting.getBillingDetailsByBillId)]
         public async Task<IActionResult> GetBillingDetailsByBillId([FromRoute] GetBillingDetailsByBillIdQuery query)
-        {
-            var result = await Mediator.Send(query);
-            return Ok(result);
-        }
-
-
-        // GetBillingHistoryForSubscriberQuery
-        [HttpGet]
-        [Route(Router.BillingRouting.getBillingHistoryForSubscriber)]
-        public async Task<IActionResult> GetBillingHistoryForSubscriber([FromRoute] GetBillingHistoryForSubscriberQuery query)
         {
             var result = await Mediator.Send(query);
             return Ok(result);

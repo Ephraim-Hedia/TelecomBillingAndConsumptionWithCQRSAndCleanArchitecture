@@ -31,6 +31,7 @@
     <Folder Include="Features\PaymentsFeatures\Queries\Handlers\" />
     <Folder Include="Features\PaymentsFeatures\Queries\Models\" />
     <Folder Include="Features\PaymentsFeatures\Queries\Results\" />
+    <Folder Include="Mapping\BillingMapping\Commands\" />
   </ItemGroup>
 
 </Project>

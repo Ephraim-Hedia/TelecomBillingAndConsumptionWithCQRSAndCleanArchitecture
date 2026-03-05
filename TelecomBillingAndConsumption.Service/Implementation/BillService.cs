@@ -106,6 +106,11 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             return bill.Id;
         }
 
+        public IQueryable<Bill> GetAllBillsBySubsriberIdQuarable(int subscriberId)
+        {
+            return _billRepository.GetBillsBySubscriberIdQuarable(subscriberId);
+        }
+
         public async Task<Bill> GetBillAsync(int billId)
             => await _billRepository.GetByIdWithIncludesAsync(billId);
     }
