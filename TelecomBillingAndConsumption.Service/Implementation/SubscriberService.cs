@@ -80,6 +80,12 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         {
             return await _subscriberRepository.GetTableNoTracking().AnyAsync(s => s.PhoneNumber == phoneNumber && !s.IsDeleted);
         }
+
+
+        public async Task<bool> UpdateSubscriberPlanAsync(int subscriberId, int newPlanId)
+        {
+            return await _subscriberRepository.UpdateSubscriberPlanAsync(subscriberId, newPlanId);
+        }
         #endregion
 
     }

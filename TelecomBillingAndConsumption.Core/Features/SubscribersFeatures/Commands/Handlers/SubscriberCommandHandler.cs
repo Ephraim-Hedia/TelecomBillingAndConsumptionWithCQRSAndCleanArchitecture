@@ -14,7 +14,8 @@ namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Command
         IRequestHandler<UpdateSubscriberByIdCommand, Response<string>>,
         IRequestHandler<DeleteSubscriberByIdCommand, Response<string>>,
         IRequestHandler<ActivateSubscriberByIdCommand, Response<string>>,
-        IRequestHandler<DeactivateSubscriberByIdCommand, Response<string>>
+        IRequestHandler<DeactivateSubscriberByIdCommand, Response<string>>,
+        IRequestHandler<UpdateSubscriberPlanCommand, Response<string>>
     {
         #region Fields
         private readonly ISubscriberService _subscriberService;
@@ -81,6 +82,15 @@ namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Command
             return success
                 ? Success("Subscriber deactivated successfully.")
                 : NotFound<string>(_localizer[SharedResourcesKeys.NotFound]);
+        }
+
+        public async Task<Response<string>> Handle(UpdateSubscriberPlanCommand request, CancellationToken cancellationToken)
+        {
+            var success = await _subscriberService.UpdateSubscriberPlanAsync(request.SubscriberId, request.NewPlanId);
+            if (!success)
+                return NotFound<string>("Subscriber or Plan not found / update failed.");
+
+            return Success("Plan updated successfully.");
         }
         #endregion
     }

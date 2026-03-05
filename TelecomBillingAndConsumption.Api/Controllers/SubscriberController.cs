@@ -57,5 +57,14 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             }
             return Ok(result);
         }
+
+        [HttpPut(Router.Subscribers.updatePlan)]
+        public async Task<IActionResult> UpdatePlan(int id, [FromBody] UpdateSubscriberPlanCommand command)
+        {
+            command.SubscriberId = id;
+            return Ok(await Mediator.Send(command));
+
+
+        }
     }
 }

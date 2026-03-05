@@ -7,6 +7,6 @@ namespace TelecomBillingAndConsumption.Infrastructure.Interfaces
     {
         IQueryable<Subscriber> QueryWithIncludes();
         Task<Subscriber> GetSubscriberByIdWithIncludes(int id);
-
+        public Task<bool> UpdateSubscriberPlanAsync(int subscriberId, int newPlanId);
     }
 }

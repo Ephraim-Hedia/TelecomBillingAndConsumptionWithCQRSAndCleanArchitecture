@@ -28,5 +28,15 @@ namespace TelecomBillingAndConsumption.Infrastructure.Repositories
             .Include(s => s.UsageRecords)
             .Where(s => !s.IsDeleted);  // Add more Includes if needed
         }
+        public async Task<bool> UpdateSubscriberPlanAsync(int subscriberId, int newPlanId)
+        {
+            var subscriber = await GetByIdAsync(subscriberId);
+            if (subscriber == null || subscriber.IsDeleted)
+                return false;
+
+            subscriber.PlanId = newPlanId;
+            await UpdateAsync(subscriber);
+            return true;
+        }
     }
 }

@@ -42,6 +42,7 @@
         {
             public const string prefix = baseRoute + "subscribers/";
             public const string getAll = prefix;
+            public const string updatePlan = prefix + "{id}/plan";
             public const string getAllPaginated = prefix + "Paginated";
             public const string getById = prefix + "{id}";
             public const string create = prefix;
