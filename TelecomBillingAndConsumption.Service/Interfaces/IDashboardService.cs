@@ -5,5 +5,7 @@ namespace TelecomBillingAndConsumption.Service.Interfaces
     public interface IDashboardService
     {
         Task<List<TopCustomerDto>> GetTopCustomersAsync(int topN);
+
+        Task<GetDashboardRevenue> GetDashboardRevenueAsync(int month, int year);
     }
 }

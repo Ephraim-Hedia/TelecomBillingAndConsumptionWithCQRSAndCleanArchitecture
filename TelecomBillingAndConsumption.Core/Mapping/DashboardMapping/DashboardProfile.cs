@@ -7,6 +7,7 @@ namespace TelecomBillingAndConsumption.Core.Mapping.DashboardMapping
         public DashboardProfile()
         {
             GetDashboardTopCustomersMapping();
+            GetDashboardRevenueMapping();
         }
     }
 }

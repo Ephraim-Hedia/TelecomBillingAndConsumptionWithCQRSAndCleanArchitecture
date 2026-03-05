@@ -39,5 +39,25 @@ namespace TelecomBillingAndConsumption.Service.Implementation
                 PhoneNumber = x.PhoneNumber
             }).ToList();
         }
+
+
+        public async Task<GetDashboardRevenue> GetDashboardRevenueAsync(int month, int year)
+        {
+            var bills = _billRepository.QueryWithIncludes()
+                .Where(b => b.Month == $"{year:D4}-{month:D2}"); // Format "YYYY-MM"
+
+            var totalRevenue = await bills.SumAsync(b => b.TotalAmount ?? 0);
+            var paidBills = await bills.Where(b => b.IsPaid == true).SumAsync(b => b.TotalAmount ?? 0);
+            var unpaidBills = await bills.Where(b => b.IsPaid == false).SumAsync(b => b.TotalAmount ?? 0);
+
+            return new GetDashboardRevenue
+            {
+                Month = month,
+                Year = year,
+                TotalRevenue = totalRevenue,
+                PaidBills = paidBills,
+                UnpaidBills = unpaidBills
+            };
+        }
     }
 }

@@ -37,9 +37,11 @@ namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.H
             throw new NotImplementedException();
         }
 
-        public Task<Response<GetDashboardRevenueResponse>> Handle(GetDashboardRevenueQuery request, CancellationToken cancellationToken)
+        public async Task<Response<GetDashboardRevenueResponse>> Handle(GetDashboardRevenueQuery request, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var data = await _dashboardService.GetDashboardRevenueAsync(request.Month, request.Year);
+            var mappedData = _mapper.Map<GetDashboardRevenueResponse>(data);
+            return Success(mappedData);
         }
 
         public Task<Response<UsageStatisticsResponse>> Handle(GetUsageStatisticsQuery request, CancellationToken cancellationToken)

@@ -21,9 +21,9 @@ namespace TelecomBillingAndConsumption.Api.Controllers
 
         [HttpGet]
         [Route(Router.DashboardRouting.getRevenue)]
-        public async Task<IActionResult> GetDashboardRevenue(GetDashboardRevenueQuery query)
+        public async Task<IActionResult> GetDashboardRevenue([FromQuery] int month, [FromQuery] int Year)
         {
-            return Ok(await Mediator.Send(query));
+            return Ok(await Mediator.Send(new GetDashboardRevenueQuery() { Month = month, Year = Year }));
         }
         [HttpGet]
         [Route(Router.DashboardRouting.getUsageStatistics)]
