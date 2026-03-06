@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Collections.Concurrent;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -17,7 +16,6 @@ namespace TelecomBillingAndConsumption.Service.Implementation
     {
         #region Fields
         private readonly JwtSettings _jwtSettings;
-        private readonly ConcurrentDictionary<string, RefreshToken> _userRefreshTokens;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
         #endregion
         #region Constructors
@@ -58,14 +56,25 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         {
             var claims = await GetClaims(user);
 
+            var signingKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_jwtSettings.Secret));
+
+            var signingCredentials = new SigningCredentials(
+                signingKey, SecurityAlgorithms.HmacSha256);
+
             var jwtToken = new JwtSecurityToken(
-                _jwtSettings.Issuer,
-                _jwtSettings.Audience,
-                claims,
-                notBefore: DateTime.Now,
-                expires: DateTime.Now.AddMinutes(_jwtSettings.AccessTokenExpireDate),
-                signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)), SecurityAlgorithms.HmacSha256Signature));
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                notBefore: DateTime.UtcNow,
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.AccessTokenExpireDate),
+                signingCredentials: signingCredentials
+            );
+
             var accessToken = new JwtSecurityTokenHandler().WriteToken(jwtToken);
+
+            Console.WriteLine("Issuer inside token: " + jwtToken.Issuer);
+
             return (jwtToken, accessToken);
         }
 
@@ -135,39 +144,46 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             return response;
         }
 
-        public async Task<string> ValidateToken(string accessToken)
+        public string ValidateToken(string accessToken)
         {
+            Console.WriteLine(accessToken);
             var handler = new JwtSecurityTokenHandler();
+
             var parameters = new TokenValidationParameters
             {
-                ValidateIssuer = _jwtSettings.ValidateIssuer,
-                ValidIssuer = _jwtSettings.Issuer,
-                ValidateIssuerSigningKey = _jwtSettings.ValidateIssuerSigningKey,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_jwtSettings.Secret)),
-                ValidAudience = _jwtSettings.Audience,
-                ValidateAudience = _jwtSettings.ValidateAudience,
-                ValidateLifetime = _jwtSettings.ValidateLifeTime,
+                ValidateIssuer = false,
+                ValidIssuer = "TelecomBillingAndConsumption",
+
+                ValidateAudience = false,
+                ValidAudience = "WebSite",
+
+                ValidateLifetime = true,
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(_jwtSettings.Secret)),
+
+                ClockSkew = TimeSpan.Zero
             };
+
             try
             {
-                var validator = handler.ValidateToken(accessToken, parameters, out SecurityToken validatedToken);
-
-                if (validator == null)
-                {
-                    return "InvalidToken";
-                }
-
+                handler.ValidateToken(accessToken, parameters, out SecurityToken validatedToken);
                 return "NotExpired";
             }
-            catch (Exception ex)
+            catch (SecurityTokenExpiredException)
             {
-                return ex.Message;
+                return "Expired";
+            }
+            catch
+            {
+                return "InvalidToken";
             }
         }
 
         public async Task<(string, DateTime?)> ValidateDetails(JwtSecurityToken jwtToken, string accessToken, string refreshToken)
         {
-            if (jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256Signature))
+            if (jwtToken == null || !jwtToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256))
             {
                 return ("AlgorithmIsWrong", null);
             }

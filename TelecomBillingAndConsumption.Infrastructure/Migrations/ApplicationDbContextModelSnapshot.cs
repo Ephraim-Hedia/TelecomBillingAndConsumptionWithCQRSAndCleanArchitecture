@@ -214,7 +214,7 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
 
                     b.HasIndex("SubscriberId");
 
-                    b.ToTable("Bills");
+                    b.ToTable("Bills", (string)null);
                 });
 
             modelBuilder.Entity("TelecomBillingAndConsumption.Data.Entities.BillDetail", b =>
@@ -379,7 +379,7 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("UserRefreshToken");
+                    b.ToTable("UserRefreshToken", (string)null);
                 });
 
             modelBuilder.Entity("TelecomBillingAndConsumption.Data.Entities.Payment", b =>

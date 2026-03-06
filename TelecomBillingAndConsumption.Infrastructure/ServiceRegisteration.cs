@@ -43,12 +43,11 @@ namespace TelecomBillingAndConsumption.Infrastructure
 
             // JWT Authentication
             var jwtSettings = new JwtSettings();
+
             configuration.GetSection(nameof(jwtSettings)).Bind(jwtSettings);
+
             services.AddSingleton(jwtSettings);
 
-
-
-            // Add Authentication
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -60,15 +59,16 @@ namespace TelecomBillingAndConsumption.Infrastructure
                x.SaveToken = true;
                x.TokenValidationParameters = new TokenValidationParameters
                {
-                   ValidateIssuer = jwtSettings.ValidateIssuer,
-                   ValidIssuer = jwtSettings.Issuer,
+                   ValidateIssuer = false,
+                   ValidIssuer = "TelecomBillingAndConsumption",
                    ValidateIssuerSigningKey = jwtSettings.ValidateIssuerSigningKey,
                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.Secret)),
                    ValidAudience = jwtSettings.Audience,
-                   ValidateAudience = jwtSettings.ValidateAudience,
+                   ValidateAudience = false,
                    ValidateLifetime = jwtSettings.ValidateLifeTime,
                };
            });
+
 
 
             //Swagger Gn
