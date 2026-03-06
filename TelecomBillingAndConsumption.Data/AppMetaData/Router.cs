@@ -21,6 +21,8 @@
         {
             public const string prefix = baseRoute + "auth/";
             public const string signIn = prefix + "signIn";
+            public const string RefreshToken = prefix + "Refresh-Token";
+            public const string ValidateToken = prefix + "Validate-Token";
             public const string signOut = prefix + "signOut";
         }
 

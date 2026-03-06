@@ -38,6 +38,7 @@ namespace TelecomBillingAndConsumption.Core.Features.ApplicationUser.Queries.Han
 
 
         #region Handle Functions
+
         public async Task<PaginatedResult<GetUserPaginatedResponse>> Handle(GetUserPaginatedQuery request, CancellationToken cancellationToken)
         {
             var applicationUsers = _userManager.Users.AsQueryable();

@@ -17,6 +17,8 @@ namespace TelecomBillingAndConsumption.Infrastructure.DatabaseConntection
         public DbSet<Payment> Payments { get; set; }
         public DbSet<TariffRule> TariffRules { get; set; }
 
+        public DbSet<UserRefreshToken> UserRefreshToken { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 
