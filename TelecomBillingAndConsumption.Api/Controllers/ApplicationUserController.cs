@@ -14,7 +14,10 @@ namespace TelecomBillingAndConsumption.Api.Controllers
         [HttpPost]
         [Route(Router.ApplicationUserRouting.create)]
         public async Task<IActionResult> CreateNewUser([FromBody] AddUserCommand command)
-            => NewResult(await Mediator.Send(command));
+        {
+            var response = await Mediator.Send(command);
+            return NewResult(response);
+        }
 
         [HttpGet]
         [Route(Router.ApplicationUserRouting.getAllPaginated)]

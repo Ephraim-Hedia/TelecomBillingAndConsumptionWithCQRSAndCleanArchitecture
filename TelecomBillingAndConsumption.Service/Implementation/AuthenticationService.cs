@@ -197,7 +197,7 @@ namespace TelecomBillingAndConsumption.Service.Implementation
             var userId = jwtToken.Claims.FirstOrDefault(x => x.Type == nameof(UserClaimModel.Id)).Value;
 
             var userRefreshToken = await _refreshTokenRepository.GetTableNoTracking()
-                                             .FirstOrDefaultAsync(x => x.Token == accessToken &&
+                                             .FirstOrDefaultAsync(x =>
                                                                      x.RefreshToken == refreshToken &&
                                                                      x.UserId == int.Parse(userId));
             if (userRefreshToken == null)
