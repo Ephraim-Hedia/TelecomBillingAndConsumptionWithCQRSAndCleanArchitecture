@@ -1,4 +1,6 @@
-﻿using TelecomBillingAndConsumption.Data.Helpers;
+﻿using Microsoft.EntityFrameworkCore;
+using TelecomBillingAndConsumption.Data.Helpers;
+using TelecomBillingAndConsumption.Infrastructure.Interfaces;
 using TelecomBillingAndConsumption.Service.HelperDtos;
 using TelecomBillingAndConsumption.Service.Interfaces;
 using TelecomBillingAndConsumption.Service.Interfaces.PlanService;
@@ -7,71 +9,102 @@ public class UsageSummaryService : IUsageSummaryService
 {
     private readonly ISubscriberService _subscriberService;
     private readonly IPlanService _planService;
-    private readonly IUsageRecordService _usageRecordService;
-    private readonly ITariffService _tariffService;
+    private readonly IUsageRecordRepository _usageRecordRepository;
+    private readonly ITariffCacheService _tariffCacheService;
 
     public UsageSummaryService(
+        ITariffCacheService tariffCacheService,
+        IUsageRecordRepository usageRecordRepository,
         ISubscriberService subscriberService,
         IPlanService planService,
         IUsageRecordService usageRecordService,
         ITariffService tariffService)
     {
+        _tariffCacheService = tariffCacheService;
+        _usageRecordRepository = usageRecordRepository;
         _subscriberService = subscriberService;
         _planService = planService;
-        _usageRecordService = usageRecordService;
-        _tariffService = tariffService;
     }
 
     public async Task<SubscriberUsageSummaryResponse> GetUsageSummaryAsync(int subscriberId, DateTime periodStart, DateTime periodEnd)
     {
-        // 1. Get subscriber & plan
+        if (periodEnd <= periodStart)
+            throw new ArgumentException("Invalid period range.");
+        //-----------------------------------------
+        // 1. Get subscriber
+        //-----------------------------------------
         var subscriber = await _subscriberService.GetByIdAsync(subscriberId);
         if (subscriber == null)
             return null;
 
+        //-----------------------------------------
+        // 2. Get plan
+        //-----------------------------------------
         var plan = await _planService.GetByIdAsync(subscriber.PlanId);
         if (plan == null)
             return null;
 
-        // 2. Get usage records for period
-        var usageRecords = await _usageRecordService.GetBySubscriberAsync(subscriber.Id);
-        var usageInPeriod = usageRecords
-            .Where(r => r.Timestamp >= periodStart && r.Timestamp < periodEnd)
-            .ToList();
+        //-----------------------------------------
+        // 3. Aggregate usage in DB
+        //-----------------------------------------
+        var usage = await _usageRecordRepository
+            .GetTableNoTracking()
+            .Where(r =>
+                r.SubscriberId == subscriberId &&
+                r.Timestamp >= periodStart &&
+                r.Timestamp < periodEnd &&
+                !r.IsDeleted)
+            .GroupBy(x => 1)
+            .Select(g => new
+            {
+                UsedCallMinutes = g.Sum(x => x.CallMinutes ?? 0),
+                UsedDataMB = g.Sum(x => x.DataMB ?? 0),
+                UsedSms = g.Sum(x => x.SMSCount ?? 0),
 
-        // 3. Aggregate usage totals
-        int usedCallMinutes = usageInPeriod.Sum(r => r.CallMinutes ?? 0);
-        decimal usedDataMB = usageInPeriod.Sum(r => r.DataMB ?? 0m);
-        int usedSmsCount = usageInPeriod.Sum(r => r.SMSCount ?? 0);
+                PeakCalls = g.Where(x => x.UsageType == UsageType.Call && x.IsPeak)
+                    .Sum(x => x.CallMinutes ?? 0),
 
-        int peakCalls = usageInPeriod
-            .Where(r => r.UsageType == UsageType.Call && r.IsPeak)
-            .Sum(r => r.CallMinutes ?? 0);
-        int offPeakCalls = usageInPeriod
-            .Where(r => r.UsageType == UsageType.Call && !r.IsPeak)
-            .Sum(r => r.CallMinutes ?? 0);
+                OffPeakCalls = g.Where(x => x.UsageType == UsageType.Call && !x.IsPeak)
+                    .Sum(x => x.CallMinutes ?? 0)
+            })
+            .FirstOrDefaultAsync();
 
-        // 4. Calculate left/over-bundle values
-        int callLeft = Math.Max(0, plan.IncludedCallMinutes - usedCallMinutes);
-        int callOverBundle = Math.Max(0, usedCallMinutes - plan.IncludedCallMinutes);
+        //-----------------------------------------
+        // 4. If no usage found
+        //-----------------------------------------
+        var usedCallMinutes = usage?.UsedCallMinutes ?? 0;
+        var usedDataMB = usage?.UsedDataMB ?? 0;
+        var usedSms = usage?.UsedSms ?? 0;
+        var peakCalls = usage?.PeakCalls ?? 0;
+        var offPeakCalls = usage?.OffPeakCalls ?? 0;
 
-        decimal dataLeft = Math.Max(0, plan.IncludedDataMB - usedDataMB);
-        decimal dataOverBundle = Math.Max(0, usedDataMB - plan.IncludedDataMB);
+        //-----------------------------------------
+        // 5. Bundle calculations
+        //-----------------------------------------
+        var (callLeft, callOver) = CalculateBundle(plan.IncludedCallMinutes, usedCallMinutes);
+        var (dataLeft, dataOver) = CalculateBundle(plan.IncludedDataMB, usedDataMB);
+        var (smsLeft, smsOver) = CalculateBundle(plan.IncludedSMS, usedSms);
 
-        int smsLeft = Math.Max(0, plan.IncludedSMS - usedSmsCount);
-        int smsOverBundle = Math.Max(0, usedSmsCount - plan.IncludedSMS);
 
-        // 5. Tariff lookup
-        var callTariff = await _tariffService.FindTariffAsync(UsageType.Call, subscriber.IsRoaming, false); // Assuming non-peak for simplicity
-        var dataTariff = await _tariffService.FindTariffAsync(UsageType.Data, subscriber.IsRoaming, false);
-        var smsTariff = await _tariffService.FindTariffAsync(UsageType.SMS, subscriber.IsRoaming, false);
+        //-----------------------------------------
+        // 6. Tariff lookup (from cache)
+        //-----------------------------------------
+        var peakCallPrice = GetTariff(UsageType.Call, subscriber.IsRoaming, true);
+        var offPeakCallPrice = GetTariff(UsageType.Call, subscriber.IsRoaming, false);
+        var dataPrice = GetTariff(UsageType.Data, subscriber.IsRoaming, false);
+        var smsPrice = GetTariff(UsageType.SMS, subscriber.IsRoaming, false);
 
+        //-----------------------------------------
+        // 7. Overage status
+        //-----------------------------------------
         bool isCallOverage = callLeft == 0;
         bool isDataOverage = dataLeft == 0;
         bool isSmsOverage = smsLeft == 0;
 
-        // 6. Compose summary DTO
-        var summary = new SubscriberUsageSummaryResponse
+        //-----------------------------------------
+        // 8. Create DTO
+        //-----------------------------------------
+        return new SubscriberUsageSummaryResponse
         {
             SubscriberId = subscriber.Id,
             SubscriberPhone = subscriber.PhoneNumber,
@@ -79,7 +112,7 @@ public class UsageSummaryService : IUsageSummaryService
 
             UsedCallMinutes = usedCallMinutes,
             UsedDataMB = usedDataMB,
-            UsedSmsCount = usedSmsCount,
+            UsedSmsCount = usedSms,
 
             CallMinutesBundle = plan.IncludedCallMinutes,
             DataBundleMB = plan.IncludedDataMB,
@@ -89,29 +122,49 @@ public class UsageSummaryService : IUsageSummaryService
             DataMBLeft = dataLeft,
             SmsLeft = smsLeft,
 
-            CallMinutesOverBundle = callOverBundle,
-            DataMBOverBundle = dataOverBundle,
-            SmsOverBundle = smsOverBundle,
+            CallMinutesOverBundle = callOver,
+            DataMBOverBundle = dataOver,
+            SmsOverBundle = smsOver,
 
             PeakCalls = peakCalls,
             OffPeakCalls = offPeakCalls,
 
-            CurrentCallUnitPrice = isCallOverage ? callTariff.PricePerUnit * 2 : callTariff.PricePerUnit,
-            CurrentDataUnitPrice = isDataOverage ? dataTariff.PricePerUnit * 2 : dataTariff.PricePerUnit,
-            CurrentSmsUnitPrice = isSmsOverage ? smsTariff.PricePerUnit * 2 : smsTariff.PricePerUnit,
+            CurrentCallUnitPrice = isCallOverage ? offPeakCallPrice * 2 : offPeakCallPrice,
+            CurrentDataUnitPrice = isDataOverage ? dataPrice * 2 : dataPrice,
+            CurrentSmsUnitPrice = isSmsOverage ? smsPrice * 2 : smsPrice,
 
-            OverageCallUnitPrice = callTariff.PricePerUnit * 2,
-            OverageDataUnitPrice = dataTariff.PricePerUnit * 2,
-            OverageSmsUnitPrice = smsTariff.PricePerUnit * 2,
+            OverageCallUnitPrice = offPeakCallPrice * 2,
+            OverageDataUnitPrice = dataPrice * 2,
+            OverageSmsUnitPrice = smsPrice * 2,
 
             IsCallOverage = isCallOverage,
             IsDataOverage = isDataOverage,
             IsSmsOverage = isSmsOverage,
 
             PeriodStart = periodStart,
-            PeriodEnd = periodEnd,
+            PeriodEnd = periodEnd
         };
+    }
 
-        return summary;
+    private decimal GetTariff(UsageType type, bool roaming, bool peak)
+    {
+        if (!_tariffCacheService.TryGetPrice(type, roaming, peak, out var price))
+            throw new InvalidOperationException($"Tariff not configured for {type} (Roaming={roaming}, Peak={peak})");
+
+        return price;
+    }
+    private (int left, int over) CalculateBundle(int bundle, int used)
+    {
+        return (
+            Math.Max(0, bundle - used),
+            Math.Max(0, used - bundle)
+        );
+    }
+    private (decimal left, decimal over) CalculateBundle(decimal bundle, decimal used)
+    {
+        return (
+            Math.Max(0, bundle - used),
+            Math.Max(0, used - bundle)
+        );
     }
 }

@@ -11,12 +11,16 @@ namespace TelecomBillingAndConsumption.Service.Implementation
     {
         #region Fields
         private readonly IGenericRepository<TariffRule> _tariffRepository;
+        private readonly ITariffCacheService _tariffCacheService;
         #endregion
 
         #region Constructors
-        public TariffService(IGenericRepository<TariffRule> tariffRepository)
+        public TariffService(
+            IGenericRepository<TariffRule> tariffRepository
+            , ITariffCacheService tariffCacheService)
         {
             _tariffRepository = tariffRepository;
+            _tariffCacheService = tariffCacheService;
         }
         #endregion
 
@@ -24,7 +28,12 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
         public IQueryable<TariffRule> QueryTariffs()
         {
-            return _tariffRepository.GetTableNoTracking().Where(x => !x.IsDeleted);
+            return _tariffRepository
+                .GetTableNoTracking()
+                .Where(x => !x.IsDeleted)
+                .OrderBy(x => x.UsageType)
+                .ThenBy(x => x.IsRoaming)
+                .ThenBy(x => x.IsPeak);
         }
 
         public async Task<List<TariffRule>> GetAllAsync()
@@ -41,12 +50,14 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         public async Task<int> AddAsync(TariffRule rule)
         {
             var result = await _tariffRepository.AddAsync(rule);
+            _tariffCacheService.Reload();
             return result.Id;
         }
 
         public async Task<bool> UpdateAsync(TariffRule rule)
         {
             await _tariffRepository.UpdateAsync(rule);
+            _tariffCacheService.Reload();
             return true;
         }
 
@@ -57,18 +68,34 @@ namespace TelecomBillingAndConsumption.Service.Implementation
                 return false;
             rule.IsDeleted = true;
             await _tariffRepository.UpdateAsync(rule);
+            _tariffCacheService.Reload();
             return true;
         }
 
-        public async Task<TariffRule?> FindTariffAsync(UsageType usageType, bool isRoaming, bool isPeak)
+        public TariffRule? FindTariff(UsageType usageType, bool isRoaming, bool isPeak)
         {
-            return await _tariffRepository.GetTableNoTracking()
-                .FirstOrDefaultAsync(t =>
-                    t.UsageType == usageType &&
-                    t.IsRoaming == isRoaming &&
-                    t.IsPeak == isPeak &&
-                    !t.IsDeleted);
+            if (!_tariffCacheService.TryGetPrice(usageType, isRoaming, isPeak, out var price))
+                return null;
+
+            return new TariffRule
+            {
+                UsageType = usageType,
+                IsRoaming = isRoaming,
+                IsPeak = isPeak,
+                PricePerUnit = price
+            };
+        }
+        public decimal GetPrice(UsageType usageType, bool isRoaming, bool isPeak)
+        {
+            if (!_tariffCacheService.TryGetPrice(usageType, isRoaming, isPeak, out var price))
+                throw new Exception($"Tariff not found for {usageType} Roaming:{isRoaming} Peak:{isPeak}");
+
+            return price;
         }
         #endregion
+
+
+
+
     }
 }

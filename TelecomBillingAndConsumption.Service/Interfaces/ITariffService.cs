@@ -11,6 +11,7 @@ namespace TelecomBillingAndConsumption.Service.Interfaces
         Task<bool> UpdateAsync(TariffRule tariffRule);
         Task<bool> DeleteAsync(int id);
         Task<TariffRule?> GetByIdAsync(int id);
-        Task<TariffRule?> FindTariffAsync(UsageType usageType, bool isRoaming, bool isPeak);
+        public TariffRule? FindTariff(UsageType usageType, bool isRoaming, bool isPeak);
+        decimal GetPrice(UsageType usageType, bool isRoaming, bool isPeak);
     }
 }

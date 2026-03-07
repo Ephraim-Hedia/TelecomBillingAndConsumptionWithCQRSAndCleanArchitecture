@@ -3,7 +3,6 @@ using TelecomBillingAndConsumption.Data.Entities;
 using TelecomBillingAndConsumption.Data.Helpers;
 using TelecomBillingAndConsumption.Infrastructure.InfrastructureBases;
 using TelecomBillingAndConsumption.Service.Interfaces;
-using TelecomBillingAndConsumption.Service.Interfaces.PlanService;
 
 namespace TelecomBillingAndConsumption.Service.Implementation
 {
@@ -11,21 +10,16 @@ namespace TelecomBillingAndConsumption.Service.Implementation
     {
         #region Fields
         private readonly IGenericRepository<UsageRecord> _usageRecordRepository;
-        private readonly ITariffService _tariffService;
         private readonly ISubscriberService _subscriberService;
-        private readonly IPlanService _planService;
+        private const int PeakStart = 8;
+        private const int PeakEnd = 20;
         #endregion
 
         #region Constructors
         public UsageRecordService(
-            IPlanService planService,
-            ITariffService tariffService,
             IGenericRepository<UsageRecord> usageRecordRepository,
             ISubscriberService subscriberService)
         {
-            _planService = planService;
-
-            _tariffService = tariffService;
             _usageRecordRepository = usageRecordRepository;
             _subscriberService = subscriberService;
         }
@@ -33,12 +27,42 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
         #region Handle Functions
 
+
+        // Create/Add
+        public async Task<int> AddAsync(UsageRecord usageRecord)
+        {
+            ValidateUsage(usageRecord);
+
+            // 1. Load the subscriber
+            var subscriber = await _subscriberService.GetByIdAsync(usageRecord.SubscriberId);
+            if (subscriber == null)
+                throw new KeyNotFoundException("Subscriber not found.");
+
+
+            // 2. Set IsRoaming from subscriber table
+            usageRecord.IsRoaming = subscriber.IsRoaming;
+
+            // 3. Calculate IsPeak from timestamp
+            if (usageRecord.Timestamp == default)
+                throw new ArgumentException("Timestamp is required.");
+
+            if (usageRecord.Timestamp > DateTime.UtcNow)
+                throw new ArgumentException("Usage timestamp cannot be in the future.");
+
+            usageRecord.IsPeak = IsPeakHour(usageRecord.Timestamp);
+
+            var result = await _usageRecordRepository.AddAsync(usageRecord);
+            return result.Id;
+        }
+
+
         // Returns all usage records with necessary includes
         public IQueryable<UsageRecord> QueryUsageRecordsWithIncludes()
         {
-            return _usageRecordRepository.GetTableNoTracking()
-                .Include(r => r.Subscriber)
-                .Include(r => r.BillDetails); // Add more includes if needed
+            return _usageRecordRepository
+                        .GetTableNoTracking()
+                        .Where(x => !x.IsDeleted)
+                        .Include(r => r.Subscriber);
         }
 
         // Gets all usage records
@@ -62,75 +86,7 @@ namespace TelecomBillingAndConsumption.Service.Implementation
                 .FirstOrDefaultAsync(r => r.Id == id);
         }
 
-        // Create/Add
-        public async Task<int> AddAsync(UsageRecord usageRecord)
-        {
-            // 1. Load the subscriber
-            var subscriber = await _subscriberService.GetByIdAsync(usageRecord.SubscriberId);
 
-            // 2. Set IsRoaming from subscriber table
-            usageRecord.IsRoaming = subscriber.IsRoaming;
-
-            // 3. Calculate IsPeak from timestamp
-            var hour = usageRecord.Timestamp.Hour;
-            usageRecord.IsPeak = hour >= 8 && hour < 20;
-
-            // 4. Get subscriber plan via _planService
-            var plan = await _planService.GetByIdAsync(subscriber.PlanId);
-
-            // 5. Get all usage records for current month (no tracking for efficiency)
-            var monthStart = new DateTime(usageRecord.Timestamp.Year, usageRecord.Timestamp.Month, 1);
-            var monthEnd = monthStart.AddMonths(1);
-
-            var usageRecordsThisMonth = await _usageRecordRepository.GetTableNoTracking()
-                .Where(r => r.SubscriberId == usageRecord.SubscriberId
-                         && r.Timestamp >= monthStart
-                         && r.Timestamp < monthEnd)
-                .ToListAsync();
-
-            // 6. Get matching tariff
-            var tariff = await _tariffService.FindTariffAsync(
-                usageRecord.UsageType,
-                usageRecord.IsRoaming,
-                usageRecord.IsPeak);
-
-            decimal unitPrice = tariff.PricePerUnit;
-
-            // 7. Calculate total cost according to business rules
-            switch (usageRecord.UsageType)
-            {
-                case UsageType.Call:
-                    int alreadyUsedMin = usageRecordsThisMonth.Sum(r => r.CallMinutes ?? 0);
-                    int newMin = usageRecord.CallMinutes ?? 0;
-                    int bundleLimitMin = plan.IncludedCallMinutes;
-                    usageRecord.TotalCost = CalculateTieredCost(alreadyUsedMin, bundleLimitMin, newMin, unitPrice);
-                    usageRecord.UnitPrice = usageRecord.TotalCost / newMin;
-                    break;
-
-                case UsageType.Data:
-                    decimal alreadyUsedMB = usageRecordsThisMonth.Sum(r => r.DataMB ?? 0);
-                    decimal newMB = usageRecord.DataMB ?? 0;
-                    decimal bundleLimitMB = plan.IncludedDataMB;
-                    usageRecord.TotalCost = CalculateTieredCostDecimal(alreadyUsedMB, bundleLimitMB, newMB, unitPrice);
-                    usageRecord.UnitPrice = usageRecord.TotalCost / newMB;
-                    break;
-
-                case UsageType.SMS:
-                    int alreadyUsedSms = usageRecordsThisMonth.Sum(r => r.SMSCount ?? 0);
-                    int newSms = usageRecord.SMSCount ?? 0;
-                    int bundleLimitSms = plan.IncludedSMS;
-                    usageRecord.TotalCost = CalculateTieredCost(alreadyUsedSms, bundleLimitSms, newSms, unitPrice);
-                    usageRecord.UnitPrice = usageRecord.TotalCost / newSms;
-                    break;
-
-                default:
-                    throw new Exception("Unknown UsageType.");
-            }
-
-            // 8. Save record
-            var result = await _usageRecordRepository.AddAsync(usageRecord);
-            return result.Id;
-        }
 
         // Delete (soft delete)
         public async Task<bool> DeleteAsync(int id)
@@ -147,25 +103,30 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
 
         #region Private Helper Functions
-
-        private decimal CalculateTieredCost(
-            int alreadyUsed, int bundleLimit, int newUnits, decimal unitPrice)
+        private bool IsPeakHour(DateTime timestamp)
         {
-            int remainingBundle = Math.Max(bundleLimit - alreadyUsed, 0);
-            int normalUnits = Math.Min(newUnits, remainingBundle);
-            int overageUnits = newUnits - normalUnits;
-            decimal totalCost = (normalUnits * unitPrice) + (overageUnits * unitPrice * 2);
-            return totalCost;
+            var hour = timestamp.Hour;
+            return hour >= PeakStart && hour < PeakEnd;
         }
-
-        private decimal CalculateTieredCostDecimal(
-            decimal alreadyUsed, decimal bundleLimit, decimal newUnits, decimal unitPrice)
+        private void ValidateUsage(UsageRecord record)
         {
-            decimal remainingBundle = Math.Max(bundleLimit - alreadyUsed, 0);
-            decimal normalUnits = Math.Min(newUnits, remainingBundle);
-            decimal overageUnits = newUnits - normalUnits;
-            decimal totalCost = (normalUnits * unitPrice) + (overageUnits * unitPrice * 2);
-            return totalCost;
+            switch (record.UsageType)
+            {
+                case UsageType.Call:
+                    if (record.CallMinutes == null || record.CallMinutes <= 0)
+                        throw new ArgumentException("Call minutes must be greater than zero.");
+                    break;
+
+                case UsageType.Data:
+                    if (record.DataMB == null || record.DataMB <= 0)
+                        throw new ArgumentException("Data usage must be greater than zero.");
+                    break;
+
+                case UsageType.SMS:
+                    if (record.SMSCount == null || record.SMSCount <= 0)
+                        throw new ArgumentException("SMS count must be greater than zero.");
+                    break;
+            }
         }
         #endregion
     }

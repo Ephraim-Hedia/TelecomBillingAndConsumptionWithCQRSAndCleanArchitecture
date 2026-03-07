@@ -30,6 +30,9 @@ namespace TelecomBillingAndConsumption.Service
             // Dashboard Service 
             services.AddScoped<IDashboardService, DashboardService>();
 
+            // To Improve the speed of getting Tariff
+            services.AddSingleton<ITariffCacheService, TariffCacheService>();
+
             services.AddScoped<IAuthenticationService, AuthenticationService>();
 
             services.AddScoped<IAuthorizationService, AuthorizationService>();

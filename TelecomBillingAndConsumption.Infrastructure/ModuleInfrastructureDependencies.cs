@@ -16,6 +16,8 @@ namespace TelecomBillingAndConsumption.Infrastructure
             services.AddScoped<IUsageRecordRepository, UsageRecordRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 
+            services.AddScoped<ITariffRepository, TariffRepository>();
+
             return services;
         }
     }
