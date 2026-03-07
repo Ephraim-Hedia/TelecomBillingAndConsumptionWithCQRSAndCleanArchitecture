@@ -13,5 +13,8 @@ namespace TelecomBillingAndConsumption.Core.Features.ApplicationUser.Commands.Mo
         public string? PhoneNumber { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
+
+        public string Role { get; set; }   // Admin or User
+        public int PlanId { get; set; }
     }
 }

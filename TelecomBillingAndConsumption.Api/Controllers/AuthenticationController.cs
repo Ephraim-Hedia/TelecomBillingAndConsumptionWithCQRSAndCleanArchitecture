@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TelecomBillingAndConsumption.Api.Bases;
 using TelecomBillingAndConsumption.Core.Features.Authentication.Commands.Models;
 using TelecomBillingAndConsumption.Core.Features.Authentication.Queries.Models;
@@ -7,6 +8,7 @@ using TelecomBillingAndConsumption.Data.AppMetaData;
 namespace TelecomBillingAndConsumption.Api.Controllers
 {
     [ApiController]
+    [AllowAnonymous]
     public class AuthenticationController : AppControllerBase
     {
         [HttpPost]

@@ -54,6 +54,14 @@ namespace TelecomBillingAndConsumption.Core.Features.ApplicationUser.Commands.Va
             .MaximumLength(11).WithMessage("PhoneNumber Max Length is 11 Char.");
 
 
+            RuleFor(x => x.Role)
+                .NotNull().WithMessage(_localizer[SharedResourcesKeys.Required])
+                .NotEmpty().WithMessage(_localizer[SharedResourcesKeys.NotEmpty]);
+
+            RuleFor(x => x.PlanId)
+                .GreaterThan(0).WithMessage(_localizer[SharedResourcesKeys.Required]);
+
+
         }
         void ApplyCustomValidationsRules()
         {

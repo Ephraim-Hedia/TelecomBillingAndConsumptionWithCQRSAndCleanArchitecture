@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TelecomBillingAndConsumption.Api.Bases;
 using TelecomBillingAndConsumption.Core.Features.PlansFeatures.Commands.Models;
 using TelecomBillingAndConsumption.Core.Features.PlansFeatures.Queries.Models;
@@ -7,6 +8,7 @@ using TelecomBillingAndConsumption.Data.AppMetaData;
 namespace TelecomBillingAndConsumption.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     public class PlansController : AppControllerBase
     {
         [HttpGet(Router.PlansRouting.getAllPaginated)]
@@ -30,11 +32,15 @@ namespace TelecomBillingAndConsumption.Api.Controllers
         }
 
 
-
+        // Admin only
+        [Authorize(Roles = "Admin")]
         [HttpPost(Router.PlansRouting.create)]
         public async Task<IActionResult> Create([FromBody] AddPlanCommand command)
              => NewResult(await Mediator.Send(command));
 
+
+        // Admin only
+        [Authorize(Roles = "Admin")]
         [HttpPut(Router.PlansRouting.update)]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdatePlanByIdCommand command)
         {
@@ -43,6 +49,8 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             return NewResult(response);
         }
 
+        // Admin only
+        [Authorize(Roles = "Admin")]
         [HttpDelete(Router.PlansRouting.delete)]
         public async Task<IActionResult> Delete(int id)
         {
@@ -50,6 +58,9 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             return NewResult(response);
         }
 
+
+        // Admin only
+        [Authorize(Roles = "Admin")]
         [HttpPut(Router.PlansRouting.activate)]
         public async Task<IActionResult> Activate([FromRoute] int id)
         {
@@ -57,6 +68,9 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             return NewResult(response);
         }
 
+
+        // Admin only
+        [Authorize(Roles = "Admin")]
         [HttpPut(Router.PlansRouting.deactivate)]
         public async Task<IActionResult> Deactivate([FromRoute] int id)
         {

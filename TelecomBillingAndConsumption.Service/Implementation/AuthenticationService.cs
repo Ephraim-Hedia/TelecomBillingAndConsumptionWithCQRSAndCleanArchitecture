@@ -18,13 +18,16 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         #region Fields
         private readonly JwtSettings _jwtSettings;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly ISubscriberRepository _subscriberRepository;
         private readonly UserManager<User> _userManager;
         #endregion
         #region Constructors
         public AuthenticationService(JwtSettings jwtSettings,
+            ISubscriberRepository subscriberRepository,
             IRefreshTokenRepository refreshTokenRepository,
             UserManager<User> userManager)
         {
+            _subscriberRepository = subscriberRepository;
             _refreshTokenRepository = refreshTokenRepository;
             _jwtSettings = jwtSettings;
             _userManager = userManager;
@@ -102,21 +105,35 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
         public async Task<List<Claim>> GetClaims(User user)
         {
-            var roles = await _userManager.GetRolesAsync(user);
             var claims = new List<Claim>()
-            {
-                new Claim(ClaimTypes.Name,user.UserName),
-                new Claim(ClaimTypes.NameIdentifier,user.UserName),
-                new Claim(ClaimTypes.Email,user.Email),
-                new Claim(nameof(UserClaimModel.PhoneNumber), user.PhoneNumber),
-                new Claim(nameof(UserClaimModel.Id), user.Id.ToString())
-            };
+                {
+                    // Identity
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                    new Claim(ClaimTypes.Name, user.UserName ?? ""),
+                    new Claim(ClaimTypes.Email, user.Email ?? ""),
+
+                    // Optional info
+                    new Claim(nameof(UserClaimModel.PhoneNumber), user.PhoneNumber ?? "")
+                };
+
+            // Add roles
+            var roles = await _userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
             }
-            //var userClaims = await _userManager.GetClaimsAsync(user);
-            //claims.AddRange(userClaims);
+
+            // If the user is a telecom customer, add subscriber data
+            var subscriber = await _subscriberRepository
+                .GetTableNoTracking()
+                .FirstOrDefaultAsync(x => x.UserId == user.Id);
+
+            if (subscriber != null)
+            {
+                claims.Add(new Claim("SubscriberId", subscriber.Id.ToString()));
+                claims.Add(new Claim("SubscriberPhone", subscriber.PhoneNumber));
+            }
+
             return claims;
         }
 
@@ -198,12 +215,16 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
             //Get User
 
-            var userId = jwtToken.Claims.FirstOrDefault(x => x.Type == nameof(UserClaimModel.Id)).Value;
+            var userId = jwtToken.Claims
+                                    .FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                return ("UserIdNotFoundInToken", null);
 
             var userRefreshToken = await _refreshTokenRepository.GetTableNoTracking()
-                                             .FirstOrDefaultAsync(x =>
-                                                                     x.RefreshToken == refreshToken &&
-                                                                     x.UserId == int.Parse(userId));
+                                                                .FirstOrDefaultAsync(x =>
+                                                                    x.RefreshToken == refreshToken &&
+                                                                    x.UserId == int.Parse(userId));
             if (userRefreshToken == null)
             {
                 return ("RefreshTokenIsNotFound", null);

@@ -15,7 +15,8 @@
             public const string create = prefix;
             public const string update = prefix;
             public const string delete = prefix + "{id}";
-            public const string changePassword = prefix + "changePassword";
+            public const string changeUserPassword = prefix + "changePassword";
+            public const string changeMyPassword = prefix + "me/changeMyPassword";
         }
         public static class AuthenticationRouting
         {
@@ -51,6 +52,9 @@
         {
             public const string prefix = baseRoute + "subscribers/";
             public const string getAll = prefix;
+            public const string GetMySubscriber = baseRoute + "me/GetMySubscribtion";
+
+
             public const string updatePlan = prefix + "{id}/plan";
             public const string getAllPaginated = prefix + "Paginated";
             public const string getById = prefix + "{id}";
@@ -77,6 +81,11 @@
         public static class BillingRouting
         {
             public const string prefix = baseRoute + "billing/";
+            public const string GetMyBills = baseRoute + "me/GetMyBills";
+            public const string GetMyBillsByMonth = baseRoute + "me/GetMyBillsByMonth";
+
+
+
             public const string getAll = prefix;
             public const string getAllPaginated = prefix + "Paginated";
             public const string getById = prefix + "{id}";

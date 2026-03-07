@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TelecomBillingAndConsumption.Api.Bases;
+using TelecomBillingAndConsumption.Api.Extensions;
 using TelecomBillingAndConsumption.Core.Features.BillingFeatures.Commands.Models;
 using TelecomBillingAndConsumption.Core.Features.BillingFeatures.Queries.Models;
 using TelecomBillingAndConsumption.Data.AppMetaData;
@@ -7,8 +9,53 @@ using TelecomBillingAndConsumption.Data.AppMetaData;
 namespace TelecomBillingAndConsumption.Api.Controllers
 {
     [ApiController]
+    [Authorize]
     public class BillingController : AppControllerBase
     {
+
+
+        // ==============================
+        // USER ENDPOINTS
+        // ==============================
+
+        [HttpGet(Router.BillingRouting.GetMyBills)]
+        public async Task<IActionResult> GetMyBills()
+        {
+            var subscriberId = User.GetSubscriberId();
+
+            if (subscriberId == null)
+                return Unauthorized();
+
+            var result = await Mediator.Send(new GetAllBillingsBySubscriberIdQuery
+            {
+                SubscriberId = subscriberId.Value
+            });
+
+            return Ok(result);
+        }
+
+        [HttpGet(Router.BillingRouting.GetMyBillsByMonth)]
+        public async Task<IActionResult> GetMyBillsByMonth([FromQuery] string month)
+        {
+            var subscriberId = User.GetSubscriberId();
+
+            if (subscriberId == null)
+                return Unauthorized();
+
+            var result = await Mediator.Send(new GetBillBySubscriberIdAndMonthQuery
+            {
+                SubscriberId = subscriberId.Value,
+                Month = month
+            });
+
+            return Ok(result);
+        }
+
+        // ==============================
+        // ADMIN ENDPOINTS
+        // ==============================
+
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [Route(Router.BillingRouting.create)]
         public async Task<IActionResult> Create([FromBody] AddBillingToSubscriberIdCommand command)
@@ -16,6 +63,9 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             var result = await Mediator.Send(command);
             return NewResult(result);
         }
+
+
+        [Authorize(Roles = "Admin")]
         [HttpGet(Router.BillingRouting.getBySubscriberId)]
         public async Task<IActionResult> GetAllPaginated(int subscriberId)
         {
@@ -23,6 +73,7 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet(Router.BillingRouting.getBySubscriberIdAndMonth)]
         public async Task<IActionResult> GetBySubscriberIdAndMonth(int subscriberId, string month)
         {
@@ -30,6 +81,7 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin")]
         // GetBillByIdQuery
         [HttpGet]
         [Route(Router.BillingRouting.getById)]
@@ -43,6 +95,7 @@ namespace TelecomBillingAndConsumption.Api.Controllers
             }
             return NewResult(result);
         }
+        [Authorize(Roles = "Admin")]
         // GetBillingDetailsByBillIdQuery
         [HttpGet]
         [Route(Router.BillingRouting.getBillingDetailsByBillId)]
