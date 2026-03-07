@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,13 +18,16 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         #region Fields
         private readonly JwtSettings _jwtSettings;
         private readonly IRefreshTokenRepository _refreshTokenRepository;
+        private readonly UserManager<User> _userManager;
         #endregion
         #region Constructors
         public AuthenticationService(JwtSettings jwtSettings,
-            IRefreshTokenRepository refreshTokenRepository)
+            IRefreshTokenRepository refreshTokenRepository,
+            UserManager<User> userManager)
         {
             _refreshTokenRepository = refreshTokenRepository;
             _jwtSettings = jwtSettings;
+            _userManager = userManager;
         }
         #endregion
         #region Handle Functions
@@ -98,7 +102,7 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
         public async Task<List<Claim>> GetClaims(User user)
         {
-            //var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(user);
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.Name,user.UserName),
@@ -107,10 +111,10 @@ namespace TelecomBillingAndConsumption.Service.Implementation
                 new Claim(nameof(UserClaimModel.PhoneNumber), user.PhoneNumber),
                 new Claim(nameof(UserClaimModel.Id), user.Id.ToString())
             };
-            //foreach (var role in roles)
-            //{
-            //    claims.Add(new Claim(ClaimTypes.Role, role));
-            //}
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
             //var userClaims = await _userManager.GetClaimsAsync(user);
             //claims.AddRange(userClaims);
             return claims;

@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <Folder Include="Features\Authentication\Queries\Results\" />
+    <Folder Include="Features\Authorization\Quaries\" />
     <Folder Include="Features\PaymentsFeatures\Commands\Handlers\" />
     <Folder Include="Features\PaymentsFeatures\Commands\Models\" />
     <Folder Include="Features\PaymentsFeatures\Commands\Validators\" />

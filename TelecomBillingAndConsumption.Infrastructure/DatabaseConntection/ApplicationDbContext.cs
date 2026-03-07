@@ -6,7 +6,7 @@ using TelecomBillingAndConsumption.Data.Entities.Identity;
 
 namespace TelecomBillingAndConsumption.Infrastructure.DatabaseConntection
 {
-    public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<int>, int, IdentityUserClaim<int>, IdentityUserRole<int>, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>
+    public class ApplicationDbContext : IdentityDbContext<User, Role, int, IdentityUserClaim<int>, IdentityUserRole<int>, IdentityUserLogin<int>, IdentityRoleClaim<int>, IdentityUserToken<int>>
     {
         // Add these DbSets
         public DbSet<Plan> Plans { get; set; }

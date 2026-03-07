@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TelecomBillingAndConsumption.Api.Bases;
 using TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Models;
 using TelecomBillingAndConsumption.Data.AppMetaData;
@@ -6,6 +7,7 @@ using TelecomBillingAndConsumption.Data.AppMetaData;
 namespace TelecomBillingAndConsumption.Api.Controllers
 {
     [ApiController]
+    [Authorize(Roles = ("Admin"))]
     public class DashboardController : AppControllerBase
     {
         // GetDashboardOverviewQuery

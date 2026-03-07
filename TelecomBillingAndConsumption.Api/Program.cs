@@ -1,11 +1,14 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using TelecomBillingAndConsumption.Core;
 using TelecomBillingAndConsumption.Core.Middlewares;
+using TelecomBillingAndConsumption.Data.Entities.Identity;
 using TelecomBillingAndConsumption.Infrastructure;
 using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
+using TelecomBillingAndConsumption.Infrastructure.Seeder;
 using TelecomBillingAndConsumption.Service;
 var builder = WebApplication.CreateBuilder(args);
 
@@ -67,6 +70,16 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
 
 
 var app = builder.Build();
+
+#region Seeding
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
+    await RoleSeeder.SeedAsync(roleManager);
+    await UserSeeder.SeedAsync(userManager);
+}
+#endregion
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

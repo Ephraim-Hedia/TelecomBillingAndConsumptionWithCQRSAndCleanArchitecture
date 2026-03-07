@@ -53,11 +53,14 @@ namespace TelecomBillingAndConsumption.Core.Features.ApplicationUser.Commands.Ha
 
             // Create New User
             var identityUser = _mapper.Map<User>(request);
+
+
             var createResult = await _userManager.CreateAsync(identityUser, request.Password);
 
             if (!createResult.Succeeded)
                 return BadRequest<string>(createResult.Errors.FirstOrDefault().Description);
 
+            await _userManager.AddToRoleAsync(identityUser, "User");
             return Created("");
         }
 

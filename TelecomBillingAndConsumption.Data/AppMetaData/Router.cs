@@ -26,6 +26,13 @@
             public const string signOut = prefix + "signOut";
         }
 
+        public static class AuthorizationRouting
+        {
+            public const string prefix = baseRoute + "authorization";
+            public const string create = prefix + "/create-role";
+        }
+
+
 
         public static class PlansRouting
         {

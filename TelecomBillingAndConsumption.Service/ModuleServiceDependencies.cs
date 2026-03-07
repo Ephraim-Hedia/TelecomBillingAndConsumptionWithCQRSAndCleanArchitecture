@@ -31,6 +31,8 @@ namespace TelecomBillingAndConsumption.Service
             services.AddScoped<IDashboardService, DashboardService>();
 
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+            services.AddScoped<IAuthorizationService, AuthorizationService>();
             return services;
         }
 
