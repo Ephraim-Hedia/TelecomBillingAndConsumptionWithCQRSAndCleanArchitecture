@@ -1,4 +1,5 @@
-﻿using TelecomBillingAndConsumption.Data.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using TelecomBillingAndConsumption.Data.Entities;
 using TelecomBillingAndConsumption.Infrastructure.InfrastructureBases;
 using TelecomBillingAndConsumption.Service.Interfaces.PlanService;
 
@@ -24,9 +25,9 @@ namespace TelecomBillingAndConsumption.Service.Implementation.PlanService
         #region Handle Functions
         public async Task<List<Plan>> GetAllAsync()
         {
-            return _planRepository.GetTableNoTracking()
+            return await _planRepository.GetTableNoTracking()
                 .Where(p => !p.IsDeleted)
-                .ToList();
+                .ToListAsync();
         }
 
         public async Task<Plan?> GetByIdAsync(int id)

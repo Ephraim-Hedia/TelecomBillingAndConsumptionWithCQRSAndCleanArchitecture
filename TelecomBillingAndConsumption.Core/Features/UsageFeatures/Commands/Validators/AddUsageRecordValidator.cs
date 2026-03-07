@@ -62,36 +62,36 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Vali
         public void ApplyCustomValidationsRules()
         {
 
-            RuleFor(x => x.SubscriberId)
-            .GreaterThan(0).WithMessage(_localizer[SharedResourcesKeys.Required] + " Subscriber Id is required.")
-            .MustAsync(async (subscriberId, cancellation) =>
-            {
-                var exists = await _subscriberService.GetByIdAsync(subscriberId);
-                return exists != null;
-            })
-            .WithMessage(_localizer["Subscriber does not exist."]);
+            //RuleFor(x => x.SubscriberId)
+            //.GreaterThan(0).WithMessage(_localizer[SharedResourcesKeys.Required] + " Subscriber Id is required.")
+            //.MustAsync(async (subscriberId, cancellation) =>
+            //{
+            //    var exists = await _subscriberService.GetByIdAsync(subscriberId);
+            //    return exists != null;
+            //})
+            //.WithMessage(_localizer["Subscriber does not exist."]);
 
-            // Tariff existence/business logic check
-            RuleFor(x => x)
-                .MustAsync(async (command, cancellation) =>
-                {
-                    // Get the subscriber (already validated)
-                    var subscriber = await _subscriberService.GetByIdAsync(command.SubscriberId);
+            //// Tariff existence/business logic check
+            //RuleFor(x => x)
+            //    .MustAsync(async (command, cancellation) =>
+            //    {
+            //        // Get the subscriber (already validated)
+            //        var subscriber = await _subscriberService.GetByIdAsync(command.SubscriberId);
 
-                    // Calculate IsPeak from Timestamp
-                    var hour = command.Timestamp.Hour;
-                    bool isPeak = hour >= 8 && hour < 20;
-                    bool isRoaming = subscriber != null && subscriber.IsRoaming;
+            //        // Calculate IsPeak from Timestamp
+            //        var hour = command.Timestamp.Hour;
+            //        bool isPeak = hour >= 8 && hour < 20;
+            //        bool isRoaming = subscriber != null && subscriber.IsRoaming;
 
-                    // Check for matching tariff
-                    var tariff = await _tariffService.FindTariffAsync(
-                        command.UsageType,
-                        isRoaming,
-                        isPeak
-                    );
-                    return tariff != null;
-                })
-                .WithMessage(_localizer["No valid tariff found for given UsageType, Roaming, and Peak conditions."]);
+            //        // Check for matching tariff
+            //        var tariff = await _tariffService.FindTariffAsync(
+            //            command.UsageType,
+            //            isRoaming,
+            //            isPeak
+            //        );
+            //        return tariff != null;
+            //    })
+            //    .WithMessage(_localizer["No valid tariff found for given UsageType, Roaming, and Peak conditions."]);
             #endregion
         }
     }

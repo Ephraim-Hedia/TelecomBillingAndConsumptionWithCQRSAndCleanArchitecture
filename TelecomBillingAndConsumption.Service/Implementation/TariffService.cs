@@ -49,6 +49,17 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
         public async Task<int> AddAsync(TariffRule rule)
         {
+            ValidateTariffRule(rule);
+
+            var exists = await QueryTariffs()
+                                            .AnyAsync(x =>
+                                                x.UsageType == rule.UsageType &&
+                                                x.IsRoaming == rule.IsRoaming &&
+                                                x.IsPeak == rule.IsPeak);
+
+            if (exists)
+                throw new InvalidOperationException("Tariff rule already exists.");
+
             var result = await _tariffRepository.AddAsync(rule);
             _tariffCacheService.Reload();
             return result.Id;
@@ -56,6 +67,17 @@ namespace TelecomBillingAndConsumption.Service.Implementation
 
         public async Task<bool> UpdateAsync(TariffRule rule)
         {
+            ValidateTariffRule(rule);
+            var exists = await QueryTariffs()
+                                            .AnyAsync(x =>
+                                                x.Id != rule.Id &&
+                                                x.UsageType == rule.UsageType &&
+                                                x.IsRoaming == rule.IsRoaming &&
+                                                x.IsPeak == rule.IsPeak);
+
+            if (exists)
+                throw new InvalidOperationException("Tariff rule already exists.");
+
             await _tariffRepository.UpdateAsync(rule);
             _tariffCacheService.Reload();
             return true;
@@ -88,13 +110,21 @@ namespace TelecomBillingAndConsumption.Service.Implementation
         public decimal GetPrice(UsageType usageType, bool isRoaming, bool isPeak)
         {
             if (!_tariffCacheService.TryGetPrice(usageType, isRoaming, isPeak, out var price))
-                throw new Exception($"Tariff not found for {usageType} Roaming:{isRoaming} Peak:{isPeak}");
+                throw new InvalidOperationException($"Tariff not found for {usageType} (Roaming:{isRoaming}, Peak:{isPeak})");
 
             return price;
         }
         #endregion
 
 
+        private void ValidateTariffRule(TariffRule rule)
+        {
+            if (rule == null)
+                throw new ArgumentNullException(nameof(rule));
+
+            if (rule.UsageType != UsageType.Call && rule.IsPeak)
+                throw new ArgumentException("Peak pricing applies only to Call usage.");
+        }
 
 
     }

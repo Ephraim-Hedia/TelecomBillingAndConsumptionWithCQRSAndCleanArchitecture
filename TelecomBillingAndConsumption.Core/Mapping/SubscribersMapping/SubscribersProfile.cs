@@ -11,6 +11,7 @@ namespace TelecomBillingAndConsumption.Core.Mapping.SubscribersMapping
             GetAllSubscribersPaginatedMapping();
             GetSubscriberByIdMapping();
             GetSubscriberByPhoneNumberMappingMethod();
+            GetSubscriberUsageSummaryMapping();
         }
     }
 }
