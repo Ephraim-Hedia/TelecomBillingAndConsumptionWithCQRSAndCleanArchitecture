@@ -23,7 +23,6 @@ namespace TelecomBillingAndConsumption.Infrastructure.Configuration
             builder.HasIndex(s => s.PhoneNumber)
                 .IsUnique();
 
-            builder.HasIndex(s => s.UserId);
 
             builder.HasOne(s => s.Plan)
                 .WithMany(p => p.Subscribers)

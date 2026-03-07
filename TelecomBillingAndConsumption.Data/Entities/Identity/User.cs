@@ -13,6 +13,8 @@ namespace TelecomBillingAndConsumption.Data.Entities.Identity
         public string? Address { get; set; }
         public string? Country { get; set; }
 
+        public Subscriber? Subscriber { get; set; }
+
         [InverseProperty(nameof(UserRefreshToken.user))]
         public virtual ICollection<UserRefreshToken> UserRefreshTokens { get; set; }
     }

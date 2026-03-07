@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using TelecomBillingAndConsumption.Api.Bases;
 using TelecomBillingAndConsumption.Core.Features.ApplicationUser.Commands.Models;
 using TelecomBillingAndConsumption.Core.Features.ApplicationUser.Queries.Models;
@@ -8,7 +7,6 @@ using TelecomBillingAndConsumption.Data.AppMetaData;
 namespace TelecomBillingAndConsumption.Api.Controllers
 {
     [ApiController]
-    [Authorize]
     public class ApplicationUserController : AppControllerBase
     {
         [HttpPost]

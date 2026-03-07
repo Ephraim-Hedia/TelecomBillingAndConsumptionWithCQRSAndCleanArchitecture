@@ -1,4 +1,6 @@
-﻿namespace TelecomBillingAndConsumption.Data.Entities
+﻿using TelecomBillingAndConsumption.Data.Entities.Identity;
+
+namespace TelecomBillingAndConsumption.Data.Entities
 {
     public class Subscriber : BaseEntity
     {
@@ -17,7 +19,9 @@
         // Foreign Keys
         public int PlanId { get; set; }
 
-        public string? UserId { get; set; } // optional if linked to Identity
+        public int UserId { get; set; }
+
+        public User User { get; set; }
 
         // Navigation
         public Plan Plan { get; set; } = null!;

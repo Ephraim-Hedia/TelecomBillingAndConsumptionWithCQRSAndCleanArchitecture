@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
 
@@ -11,9 +12,11 @@ using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
 namespace TelecomBillingAndConsumption.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260306235526_EditINUserTable")]
+    partial class EditINUserTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -528,18 +531,12 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("PhoneNumber")
                         .IsUnique();
 
                     b.HasIndex("PlanId");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Subscribers", (string)null);
                 });
@@ -748,15 +745,7 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("TelecomBillingAndConsumption.Data.Entities.Identity.User", "User")
-                        .WithOne("Subscriber")
-                        .HasForeignKey("TelecomBillingAndConsumption.Data.Entities.Subscriber", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.Navigation("Plan");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TelecomBillingAndConsumption.Data.Entities.UsageRecord", b =>
@@ -777,8 +766,6 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
 
             modelBuilder.Entity("TelecomBillingAndConsumption.Data.Entities.Identity.User", b =>
                 {
-                    b.Navigation("Subscriber");
-
                     b.Navigation("UserRefreshTokens");
                 });
 

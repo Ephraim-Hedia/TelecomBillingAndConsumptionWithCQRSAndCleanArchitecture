@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
 
@@ -11,9 +12,11 @@ using TelecomBillingAndConsumption.Infrastructure.DatabaseConntection;
 namespace TelecomBillingAndConsumption.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260307000024_EditINUserTable2")]
+    partial class EditINUserTable2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -528,7 +531,7 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -539,7 +542,8 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
                     b.HasIndex("PlanId");
 
                     b.HasIndex("UserId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Subscribers", (string)null);
                 });
@@ -751,8 +755,7 @@ namespace TelecomBillingAndConsumption.Infrastructure.Migrations
                     b.HasOne("TelecomBillingAndConsumption.Data.Entities.Identity.User", "User")
                         .WithOne("Subscriber")
                         .HasForeignKey("TelecomBillingAndConsumption.Data.Entities.Subscriber", "UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Plan");
 
