@@ -13,7 +13,6 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Queries.Handl
     public class UsageQueryHandler : ResponseHandler
         , IRequestHandler<GetUsageRecordByIdQuery, Response<GetUsageRecordByIdResponse>>
         , IRequestHandler<GetUsageRecordsBySubscriberIdQuery, PaginatedResult<GetUsageRecordsBySubscriberIdResponse>>
-        , IRequestHandler<GetUsageSummaryBySubscriberIdQuery, PaginatedResult<GetUsageSummaryBySubscriberIdResponse>>
     {
         #region Fields
         private readonly IUsageRecordService _usageRecordService;
@@ -58,18 +57,7 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Queries.Handl
 
 
 
-        public async Task<PaginatedResult<GetUsageSummaryBySubscriberIdResponse>> Handle(GetUsageSummaryBySubscriberIdQuery request, CancellationToken cancellationToken)
-        {
-            //var records = await _usageRecordService.GetBySubscriberAsync(request.SubscriberId);
 
-
-            //var paginatedList = await _mapper
-            //    .ProjectTo<GetUsageSummaryBySubscriberIdResponse>(records)
-            //    .ToPaginatedListAsync(request.PageNumber, request.PageSize);
-            //return paginatedList;
-
-            throw new NotImplementedException();
-        }
 
 
         #endregion

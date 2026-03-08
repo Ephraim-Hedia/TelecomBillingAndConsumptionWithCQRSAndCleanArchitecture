@@ -3,10 +3,10 @@ using TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Model
 
 namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.Validators
 {
-    public class GetUsageStatisticsValidator
-        : AbstractValidator<GetUsageStatisticsQuery>
+    public class GetDashboardRevenueValidator
+        : AbstractValidator<GetDashboardRevenueQuery>
     {
-        public GetUsageStatisticsValidator()
+        public GetDashboardRevenueValidator()
         {
             RuleFor(x => x.Month)
                 .InclusiveBetween(1, 12)
@@ -17,6 +17,8 @@ namespace TelecomBillingAndConsumption.Core.Features.DashboardFeatures.Queries.V
                 .WithMessage("Year must be greater than or equal to 2000.")
                 .LessThanOrEqualTo(DateTime.UtcNow.Year)
                 .WithMessage("Year cannot be in the future.");
+
+
         }
     }
 }

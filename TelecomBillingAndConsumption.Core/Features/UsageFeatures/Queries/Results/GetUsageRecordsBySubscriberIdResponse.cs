@@ -25,8 +25,6 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Queries.Resul
 
         public DateTime Timestamp { get; set; }
 
-        public decimal UnitPrice { get; set; }
 
-        public decimal TotalCost { get; set; }
     }
 }

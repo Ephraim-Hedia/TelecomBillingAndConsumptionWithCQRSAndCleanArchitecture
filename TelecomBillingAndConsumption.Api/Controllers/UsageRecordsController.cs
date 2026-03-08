@@ -82,5 +82,12 @@ namespace TelecomBillingAndConsumption.Api.Controllers
         {
             return Ok(await Mediator.Send(new DeleteUsageRecordByIdCommand() { Id = id }));
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost(Router.UsageRecords.bulk)]
+        public async Task<IActionResult> AddUsageBulk([FromBody] AddUsageRecordsBulkCommand command)
+        {
+            return Ok(await Mediator.Send(command));
+        }
     }
 }

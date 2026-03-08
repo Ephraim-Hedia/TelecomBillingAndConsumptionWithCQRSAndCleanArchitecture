@@ -76,6 +76,7 @@
             public const string getBySubscriberId = prefix + "subscriber/{subscriberId}";
             public const string create = prefix;
             public const string delete = prefix + "{id}";
+            public const string bulk = prefix + "bulk";
         }
 
         public static class BillingRouting

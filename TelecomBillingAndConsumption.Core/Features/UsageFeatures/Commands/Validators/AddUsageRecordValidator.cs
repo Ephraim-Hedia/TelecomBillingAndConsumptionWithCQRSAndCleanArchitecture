@@ -9,90 +9,107 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Vali
 {
     public class AddUsageRecordValidator : AbstractValidator<AddUsageRecordCommand>
     {
-        #region Fields
-        private readonly IStringLocalizer<SharedResources> _localizer;
         private readonly ISubscriberService _subscriberService;
-        private readonly ITariffService _tariffService;
-        #endregion
-        #region Constructors
+        private readonly IStringLocalizer<SharedResources> _localizer;
+
         public AddUsageRecordValidator(
             ISubscriberService subscriberService,
-            ITariffService tariffService,
             IStringLocalizer<SharedResources> stringLocalizer)
         {
-
-            _localizer = stringLocalizer;
-            _tariffService = tariffService;
             _subscriberService = subscriberService;
-            ApplyValidationsRules();
-            ApplyCustomValidationsRules();
+            _localizer = stringLocalizer;
+
+            ApplyBasicValidation();
+            ApplyUsageTypeValidation();
+            ApplyCustomValidation();
         }
-        #endregion
 
-        #region Handle Functions
-
-        public void ApplyValidationsRules()
+        private void ApplyBasicValidation()
         {
             RuleFor(x => x.SubscriberId)
-                .GreaterThan(0).WithMessage("SubscriberId must be greater than 0.");
+                .GreaterThan(0)
+                .WithMessage("SubscriberId must be greater than 0.");
+
             RuleFor(x => x.Timestamp)
-                .LessThanOrEqualTo(DateTime.UtcNow).WithMessage("Timestamp cannot be in the future.");
+                .NotEmpty()
+                .WithMessage("Timestamp is required.")
+                .LessThanOrEqualTo(DateTime.UtcNow)
+                .WithMessage("Usage timestamp cannot be in the future.");
+
             RuleFor(x => x.UsageType)
-                .IsInEnum().WithMessage("Invalid UsageType value.");
-            When(x => x.UsageType == UsageType.Data, () =>
-            {
-                RuleFor(x => x.DataMB)
-                    .NotNull().WithMessage("DataMB is required for Data usage type.")
-                    .GreaterThan(0).WithMessage("DataMB must be greater than 0.");
-            });
+                .IsInEnum()
+                .WithMessage("Invalid UsageType value.");
+        }
+
+        private void ApplyUsageTypeValidation()
+        {
             When(x => x.UsageType == UsageType.Call, () =>
             {
                 RuleFor(x => x.CallMinutes)
-                    .NotNull().WithMessage("CallMinutes is required for Call usage type.")
-                    .GreaterThan(0).WithMessage("CallMinutes must be greater than 0.");
+                    .NotNull()
+                    .WithMessage("CallMinutes is required for Call usage.")
+                    .GreaterThan(0)
+                    .WithMessage("CallMinutes must be greater than 0.")
+                    .LessThanOrEqualTo(120)
+                    .WithMessage("CallMinutes cannot exceed 120 minutes per record.");
+
+                RuleFor(x => x.DataMB)
+                    .Null()
+                    .WithMessage("DataMB must be null when UsageType is Call.");
+
+                RuleFor(x => x.SMSCount)
+                    .Null()
+                    .WithMessage("SMSCount must be null when UsageType is Call.");
             });
+
+            When(x => x.UsageType == UsageType.Data, () =>
+            {
+                RuleFor(x => x.DataMB)
+                    .NotNull()
+                    .WithMessage("DataMB is required for Data usage.")
+                    .GreaterThan(0)
+                    .WithMessage("DataMB must be greater than 0.")
+                    .LessThanOrEqualTo(5000)
+                    .WithMessage("DataMB cannot exceed 5000 MB per record.");
+
+                RuleFor(x => x.CallMinutes)
+                    .Null()
+                    .WithMessage("CallMinutes must be null when UsageType is Data.");
+
+                RuleFor(x => x.SMSCount)
+                    .Null()
+                    .WithMessage("SMSCount must be null when UsageType is Data.");
+            });
+
             When(x => x.UsageType == UsageType.SMS, () =>
             {
                 RuleFor(x => x.SMSCount)
-                    .NotNull().WithMessage("SMSCount is required for SMS usage type.")
-                    .GreaterThan(0).WithMessage("SMSCount must be greater than 0.");
+                    .NotNull()
+                    .WithMessage("SMSCount is required for SMS usage.")
+                    .GreaterThan(0)
+                    .WithMessage("SMSCount must be greater than 0.")
+                    .LessThanOrEqualTo(50)
+                    .WithMessage("SMSCount cannot exceed 50 messages per record.");
+
+                RuleFor(x => x.CallMinutes)
+                    .Null()
+                    .WithMessage("CallMinutes must be null when UsageType is SMS.");
+
+                RuleFor(x => x.DataMB)
+                    .Null()
+                    .WithMessage("DataMB must be null when UsageType is SMS.");
             });
         }
 
-        public void ApplyCustomValidationsRules()
+        private void ApplyCustomValidation()
         {
-
-            //RuleFor(x => x.SubscriberId)
-            //.GreaterThan(0).WithMessage(_localizer[SharedResourcesKeys.Required] + " Subscriber Id is required.")
-            //.MustAsync(async (subscriberId, cancellation) =>
-            //{
-            //    var exists = await _subscriberService.GetByIdAsync(subscriberId);
-            //    return exists != null;
-            //})
-            //.WithMessage(_localizer["Subscriber does not exist."]);
-
-            //// Tariff existence/business logic check
-            //RuleFor(x => x)
-            //    .MustAsync(async (command, cancellation) =>
-            //    {
-            //        // Get the subscriber (already validated)
-            //        var subscriber = await _subscriberService.GetByIdAsync(command.SubscriberId);
-
-            //        // Calculate IsPeak from Timestamp
-            //        var hour = command.Timestamp.Hour;
-            //        bool isPeak = hour >= 8 && hour < 20;
-            //        bool isRoaming = subscriber != null && subscriber.IsRoaming;
-
-            //        // Check for matching tariff
-            //        var tariff = await _tariffService.FindTariffAsync(
-            //            command.UsageType,
-            //            isRoaming,
-            //            isPeak
-            //        );
-            //        return tariff != null;
-            //    })
-            //    .WithMessage(_localizer["No valid tariff found for given UsageType, Roaming, and Peak conditions."]);
-            #endregion
+            RuleFor(x => x.SubscriberId)
+                .MustAsync(async (subscriberId, cancellation) =>
+                {
+                    var subscriber = await _subscriberService.GetByIdAsync(subscriberId);
+                    return subscriber != null;
+                })
+                .WithMessage("Subscriber does not exist.");
         }
     }
 }

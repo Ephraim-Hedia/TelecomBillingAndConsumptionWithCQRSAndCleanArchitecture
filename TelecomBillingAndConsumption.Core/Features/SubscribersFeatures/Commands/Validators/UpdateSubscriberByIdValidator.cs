@@ -1,47 +1,38 @@
 ﻿using FluentValidation;
-using Microsoft.Extensions.Localization;
 using TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Commands.Models;
-using TelecomBillingAndConsumption.Core.Resources;
+using TelecomBillingAndConsumption.Service.Interfaces.PlanService;
 
 namespace TelecomBillingAndConsumption.Core.Features.SubscribersFeatures.Commands.Validators
 {
     public class UpdateSubscriberByIdValidator : AbstractValidator<UpdateSubscriberByIdCommand>
     {
-        #region Fields
-        private readonly IStringLocalizer<SharedResources> _localizer;
-        #endregion
-        #region Constructors
-        public UpdateSubscriberByIdValidator(IStringLocalizer<SharedResources> stringLocalizer)
-        {
-            _localizer = stringLocalizer;
-            ApplyValidationsRules();
-            ApplyCustomValidationsRules();
-        }
-        #endregion
+        private readonly IPlanService _planService;
 
-        #region Handle Functions
-        public void ApplyValidationsRules()
+        public UpdateSubscriberByIdValidator(IPlanService planService)
         {
+            _planService = planService;
             RuleFor(x => x.Id)
-                .GreaterThan(0).WithMessage("Id must be greater than 0.");
+                .GreaterThan(0)
+                .WithMessage("Subscriber Id must be greater than 0.");
+
             RuleFor(x => x.Name)
-                .NotNull().WithMessage(_localizer[SharedResourcesKeys.Required])
-                .NotEmpty().WithMessage(_localizer[SharedResourcesKeys.NotEmpty])
-                .MaximumLength(50).WithMessage("Name Max Length is 50 Char.");
+                .NotEmpty()
+                .WithMessage("Subscriber name is required.")
+                .MaximumLength(50);
+
             RuleFor(x => x.Country)
-                .NotNull().WithMessage(_localizer[SharedResourcesKeys.Required])
-                .NotEmpty().WithMessage(_localizer[SharedResourcesKeys.NotEmpty])
-                .MaximumLength(50).WithMessage("Country Max Length is 50 Char.");
+                .NotEmpty()
+                .WithMessage("Country is required.");
+
             RuleFor(x => x.PlanId)
-                .GreaterThan(0).WithMessage("Plan Id must be greater than 0.");
+                .GreaterThan(0)
+                .WithMessage("PlanId must be greater than 0.")
+                .MustAsync(async (planId, cancellation) =>
+                {
+                    var plan = await _planService.GetByIdAsync(planId);
+                    return plan != null;
+                })
+                .WithMessage("Selected plan does not exist.");
         }
-
-        public void ApplyCustomValidationsRules()
-        {
-        }
-
-        #endregion
-
-
     }
 }

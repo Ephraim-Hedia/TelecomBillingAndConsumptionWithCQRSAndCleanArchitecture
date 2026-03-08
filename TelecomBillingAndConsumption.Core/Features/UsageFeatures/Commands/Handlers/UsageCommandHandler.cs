@@ -11,7 +11,8 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Hand
 {
     public class UsageCommandHandler : ResponseHandler,
         IRequestHandler<AddUsageRecordCommand, Response<int>>,
-        IRequestHandler<DeleteUsageRecordByIdCommand, Response<string>>
+        IRequestHandler<DeleteUsageRecordByIdCommand, Response<string>>,
+        IRequestHandler<AddUsageRecordsBulkCommand, Response<string>>
     {
         #region Fields
         private readonly IUsageRecordService _usageRecordService;
@@ -48,6 +49,19 @@ namespace TelecomBillingAndConsumption.Core.Features.UsageFeatures.Commands.Hand
             return result
                 ? Deleted<string>(_localizer[SharedResourcesKeys.Deleted])
                 : NotFound<string>(_localizer[SharedResourcesKeys.NotFound]);
+        }
+        public async Task<Response<string>> Handle(AddUsageRecordsBulkCommand request, CancellationToken cancellationToken)
+        {
+            if (request.Records == null || !request.Records.Any())
+                return BadRequest<string>("No usage records provided.");
+
+            foreach (var record in request.Records)
+            {
+                var entity = _mapper.Map<UsageRecord>(record);
+                await _usageRecordService.AddAsync(entity);
+            }
+
+            return Success("Bulk usage records inserted successfully.");
         }
         #endregion
 
