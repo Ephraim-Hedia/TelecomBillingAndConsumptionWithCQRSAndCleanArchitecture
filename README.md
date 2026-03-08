@@ -20,44 +20,44 @@ A RESTful API built with ASP.NET Core for managing telecom subscribers, tracking
 
 ## Tech Stack
 
-### Backend Framework
+#### Backend Framework
 - ASP.NET Core 8 Web API
 
-### Architecture
+#### Architecture
 - Clean Architecture
 - CQRS Pattern using MediatR
 
-### Database
+#### Database
 - SQL Server
 - Entity Framework Core
 - EF Core Migrations
 
-### Authentication & Authorization
+#### Authentication & Authorization
 - ASP.NET Identity
 - JWT Authentication
 - Role-based Authorization (Admin / User)
 
-### Validation
+#### Validation
 - FluentValidation
 
-### Object Mapping
+#### Object Mapping
 - AutoMapper
 
-### Localization
+#### Localization
 - ASP.NET Core Localization
 - Resource-based localization using `.resx` files
 
-### Caching
+#### Caching
 - In-memory caching for Tariff rules
 
-### API Documentation
+#### API Documentation
 - Swagger / OpenAPI
 
-### Containerization
+#### Containerization
 - Docker
 - Docker Compose
 
-### Development Tools
+#### Development Tools
 - Visual Studio
 - Postman for API testing
 
