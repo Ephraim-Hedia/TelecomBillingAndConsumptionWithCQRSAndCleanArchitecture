@@ -20,7 +20,7 @@
 
         public decimal? TotalAmount { get; set; }
 
-        public bool? IsPaid { get; set; }
+        public bool IsPaid { get; set; } = false;
 
         // Navigation
         public Subscriber? Subscriber { get; set; } = null!;

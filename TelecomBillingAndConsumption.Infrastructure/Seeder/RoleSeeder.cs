@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using TelecomBillingAndConsumption.Data.Entities.Identity;
 
 namespace TelecomBillingAndConsumption.Infrastructure.Seeder
@@ -8,18 +7,19 @@ namespace TelecomBillingAndConsumption.Infrastructure.Seeder
     {
         public static async Task SeedAsync(RoleManager<Role> _roleManager)
         {
-            var rolesCount = await _roleManager.Roles.CountAsync();
-            if (rolesCount <= 0)
-            {
+            var roles = new[] { "Admin", "User" };
 
-                await _roleManager.CreateAsync(new Role()
+            foreach (var roleName in roles)
+            {
+                var exists = await _roleManager.RoleExistsAsync(roleName);
+
+                if (!exists)
                 {
-                    Name = "Admin"
-                });
-                await _roleManager.CreateAsync(new Role()
-                {
-                    Name = "User"
-                });
+                    await _roleManager.CreateAsync(new Role
+                    {
+                        Name = roleName
+                    });
+                }
             }
         }
 

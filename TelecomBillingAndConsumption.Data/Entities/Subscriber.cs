@@ -21,7 +21,7 @@ namespace TelecomBillingAndConsumption.Data.Entities
 
         public int UserId { get; set; }
 
-        public User User { get; set; }
+        public User User { get; set; } = null!;
 
         // Navigation
         public Plan Plan { get; set; } = null!;

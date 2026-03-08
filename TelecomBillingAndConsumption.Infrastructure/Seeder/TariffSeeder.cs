@@ -9,60 +9,71 @@ namespace TelecomBillingAndConsumption.Infrastructure.Seeder
     {
         public static async Task SeedAsync(ApplicationDbContext context)
         {
-            var count = await context.TariffRules.CountAsync();
-
-            if (count > 0)
+            if (await context.TariffRules.AnyAsync())
                 return;
 
             var tariffs = new List<TariffRule>
             {
+                // CALLS
                 new TariffRule
                 {
-                    Id = 1,
-                    UsageType = UsageType.Call,
-                    IsRoaming = true,
-                    IsPeak = false,
-                    PricePerUnit = 0.1500m
-                },
-                new TariffRule
-                {
-                    Id = 6,
                     UsageType = UsageType.Call,
                     IsRoaming = false,
                     IsPeak = false,
-                    PricePerUnit = 0.0500m
+                    PricePerUnit = 0.05m
                 },
                 new TariffRule
                 {
-                    Id = 8,
+                    UsageType = UsageType.Call,
+                    IsRoaming = false,
+                    IsPeak = true,
+                    PricePerUnit = 0.15m
+                },
+                new TariffRule
+                {
+                    UsageType = UsageType.Call,
+                    IsRoaming = true,
+                    IsPeak = false,
+                    PricePerUnit = 0.15m
+                },
+                new TariffRule
+                {
+                    UsageType = UsageType.Call,
+                    IsRoaming = true,
+                    IsPeak = true,
+                    PricePerUnit = 0.15m
+                },
+
+                // DATA
+                new TariffRule
+                {
                     UsageType = UsageType.Data,
                     IsRoaming = false,
                     IsPeak = false,
-                    PricePerUnit = 0.0500m
+                    PricePerUnit = 0.05m
                 },
                 new TariffRule
                 {
-                    Id = 9,
                     UsageType = UsageType.Data,
                     IsRoaming = true,
                     IsPeak = false,
-                    PricePerUnit = 0.2000m
+                    PricePerUnit = 0.20m
                 },
+
+                // SMS
                 new TariffRule
                 {
-                    Id = 10,
                     UsageType = UsageType.SMS,
                     IsRoaming = false,
                     IsPeak = false,
-                    PricePerUnit = 0.0200m
+                    PricePerUnit = 0.02m
                 },
                 new TariffRule
                 {
-                    Id = 11,
                     UsageType = UsageType.SMS,
                     IsRoaming = true,
                     IsPeak = false,
-                    PricePerUnit = 0.0200m
+                    PricePerUnit = 0.10m
                 }
             };
 

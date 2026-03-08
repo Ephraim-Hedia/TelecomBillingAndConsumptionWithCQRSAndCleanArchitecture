@@ -74,13 +74,21 @@ var app = builder.Build();
 #region Seeding
 using (var scope = app.Services.CreateScope())
 {
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<Role>>();
-    await RoleSeeder.SeedAsync(roleManager);
-    await UserSeeder.SeedAsync(userManager);
+    var services = scope.ServiceProvider;
 
-    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var roleManager = services.GetRequiredService<RoleManager<Role>>();
+    var dbContext = services.GetRequiredService<ApplicationDbContext>();
+
+    // Identity Seed
+    await RoleSeeder.SeedAsync(roleManager);
+    await UsersSeeder.SeedAsync(userManager);
+
+    // Domain Seed
+    await PlansSeeder.SeedAsync(dbContext);
+    await SubscribersSeeder.SeedAsync(dbContext);
     await TariffSeeder.SeedAsync(dbContext);
+    await UsageRecordsSeeder.SeedAsync(dbContext);
 }
 #endregion
 
