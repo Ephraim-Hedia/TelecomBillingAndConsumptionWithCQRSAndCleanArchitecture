@@ -161,54 +161,130 @@ View personal bills
 
 ## API Endpoints
 
-### Authentication
+### Authentication (for Anyone)
 
-| Method | Endpoint | Description |
-|------|------|------|
-| POST | `/api/auth/register` | Register a new user |
-| POST | `/api/auth/login` | Authenticate user and return JWT token |
+| Method | Endpoint                   | Description           |
+| ------ | -------------------------- | --------------------- |
+| POST   | `/api/auth/sign-in`        | User login            |
+| POST   | `/api/auth/refresh-token`  | Refresh JWT token     |
+| GET    | `/api/auth/validate-token` | Validate access token |
 
----
-
-### Subscribers
-
-| Method | Endpoint | Description |
-|------|------|------|
-| POST | `/api/subscribers` | Create a new subscriber |
-| GET | `/api/subscribers` | Get all subscribers |
-| PUT | `/api/subscribers/{id}` | Update subscriber information |
-| DELETE | `/api/subscribers/{id}` | Delete subscriber |
 
 ---
 
-### Usage Records
+### Users Management (Admin)
 
-| Method | Endpoint | Description |
-|------|------|------|
-| POST | `/api/usage` | Add a usage record |
-| POST | `/api/usage/bulk` | Add multiple usage records |
-| GET | `/api/usage/me` | Get usage records for the current user |
-| GET | `/api/usage/subscriber/{id}` | Get usage records for a specific subscriber |
+| Method | Endpoint                     | Description                  |
+| ------ | ---------------------------- | ---------------------------- |
+| POST   | `/api/users`                 | Create new user              |
+| GET    | `/api/users`                 | Get paginated users          |
+| GET    | `/api/users/{id}`            | Get user by id               |
+| PUT    | `/api/users`                 | Update user                  |
+| DELETE | `/api/users/{id}`            | Delete user                  |
+| PUT    | `/api/users/change-password` | Change user password (Admin) |
 
----
-
-### Billing
-
-| Method | Endpoint | Description |
-|------|------|------|
-| POST | `/api/billing/{subscriberId}/{month}` | Generate monthly bill |
-| GET | `/api/billing/{billId}` | Get bill details |
-| GET | `/api/billing/{subscriberId}/{month}` | Get bill by subscriber and month |
 
 ---
 
-### Dashboard
+### Account
 
-| Method | Endpoint | Description |
-|------|------|------|
-| GET | `/api/statistics/top-consumers` | Get top customers by consumption |
-| GET | `/api/statistics/revenue` | Get revenue statistics |
-| GET | `/api/statistics/usage` | Get usage statistics |
+| Method | Endpoint                        | Description                  |
+| ------ | ------------------------------- | ---------------------------- |
+| PUT    | `/api/users/change-my-password` | Change current user password |
+
+---
+
+### Role Management
+
+| Method | Endpoint     | Description     |
+| ------ | ------------ | --------------- |
+| POST   | `/api/roles` | Create new role |
+
+---
+
+### Subscribers (User Endpoints)
+
+
+| Method | Endpoint              | Description                        |
+| ------ | --------------------- | ---------------------------------- |
+| GET    | `/api/subscribers/me` | Get current subscriber information |
+
+### Subscribers (Admin Endpoints)
+| Method | Endpoint                              | Description                  |
+| ------ | ------------------------------------- | ---------------------------- |
+| GET    | `/api/subscribers`                    | Get paginated subscribers    |
+| GET    | `/api/subscribers/{id}`               | Get subscriber by id         |
+| POST   | `/api/subscribers`                    | Create subscriber            |
+| PUT    | `/api/subscribers/{id}`               | Update subscriber            |
+| DELETE | `/api/subscribers/{id}`               | Delete subscriber            |
+| PUT    | `/api/subscribers/{id}/activate`      | Activate subscriber          |
+| PUT    | `/api/subscribers/{id}/deactivate`    | Deactivate subscriber        |
+| PUT    | `/api/subscribers/{id}/plan`          | Update subscriber plan       |
+| GET    | `/api/subscribers/{id}/usage-summary` | Get subscriber usage summary |
+
+### Plans (Admin Endpoints)
+| Method | Endpoint                     | Description     |
+| ------ | ---------------------------- | --------------- |
+| GET    | `/api/plans`                 | Get all plans   |
+| GET    | `/api/plans/{id}`            | Get plan by id  |
+| POST   | `/api/plans`                 | Create plan     |
+| PUT    | `/api/plans/{id}`            | Update plan     |
+| DELETE | `/api/plans/{id}`            | Delete plan     |
+| PUT    | `/api/plans/{id}/activate`   | Activate plan   |
+| PUT    | `/api/plans/{id}/deactivate` | Deactivate plan |
+
+### Tariff Rules (Admin Endpoints)
+| Method | Endpoint            | Description          |
+| ------ | ------------------- | -------------------- |
+| GET    | `/api/tariffs`      | Get all tariff rules |
+| GET    | `/api/tariffs/{id}` | Get tariff rule      |
+| POST   | `/api/tariffs`      | Create tariff rule   |
+| PUT    | `/api/tariffs/{id}` | Update tariff rule   |
+| DELETE | `/api/tariffs/{id}` | Delete tariff rule   |
+
+### Usage Records (User Endpoints)
+| Method | Endpoint        | Description                    |
+| ------ | --------------- | ------------------------------ |
+| GET    | `/api/usage/me` | Get current user usage records |
+
+### Usage Records (Admin Endpoints)
+| Method | Endpoint                               | Description                  |
+| ------ | -------------------------------------- | ---------------------------- |
+| GET    | `/api/usage/{id}`                      | Get usage record by id       |
+| GET    | `/api/usage/subscriber/{subscriberId}` | Get subscriber usage         |
+| POST   | `/api/usage`                           | Create usage record          |
+| POST   | `/api/usage/bulk`                      | Create usage records in bulk |
+| DELETE | `/api/usage/{id}`                      | Delete usage record          |
+
+### Billing (User Endpoints)
+| Method | Endpoint                        | Description                    |
+| ------ | ------------------------------- | ------------------------------ |
+| GET    | `/api/billing/me`               | Get my bills                   |
+| GET    | `/api/billing/me?month={month}` | Get my bill for specific month |
+
+### Billing (Admin Endpoints)
+| Method | Endpoint                                         | Description                      |
+| ------ | ------------------------------------------------ | -------------------------------- |
+| POST   | `/api/billing`                                   | Generate subscriber bill         |
+| GET    | `/api/billing/subscriber/{subscriberId}`         | Get subscriber bills             |
+| GET    | `/api/billing/subscriber/{subscriberId}/{month}` | Get bill by subscriber and month |
+| GET    | `/api/billing/{id}`                              | Get bill details                 |
+| GET    | `/api/billing/{id}/details`                      | Get bill usage breakdown         |
+
+### Dashboard (Admin Endpoints)
+| Method | Endpoint                       | Description                |
+| ------ | ------------------------------ | -------------------------- |
+| GET    | `/api/dashboard/overview`      | Get dashboard overview     |
+| GET    | `/api/dashboard/revenue`       | Get revenue statistics     |
+| GET    | `/api/dashboard/usage`         | Get usage statistics       |
+| GET    | `/api/dashboard/top-customers` | Get top customers by usage |
+
+
+### Response Formats (Admin Endpoints)
+| Format     | Description                        |
+| ---------- | ---------------------------------- |
+| JSON       | Default API response               |
+| XML / SOAP | Alternative format for integration |
 
 ## Validation
 
