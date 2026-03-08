@@ -376,6 +376,5 @@ namespace TelecomBillingAndConsumption.Tests.Billing
                 Times.Once);
         }
 
-
     }
 }

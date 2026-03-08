@@ -35,6 +35,7 @@ namespace TelecomBillingAndConsumption.Api.Controllers
                 PageSize = pageSize
             });
 
+
             return Ok(result);
         }
 
@@ -53,9 +54,17 @@ namespace TelecomBillingAndConsumption.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet(Router.UsageRecords.getById)]
-        public async Task<IActionResult> GetUsageRecordById(int id)
+        public async Task<IActionResult> GetUsageRecordById(int id, [FromQuery] string responseFormat = "json")
         {
-            return Ok(await Mediator.Send(new GetUsageRecordByIdQuery() { Id = id }));
+            var result = await Mediator.Send(new GetUsageRecordByIdQuery() { Id = id });
+
+            if (responseFormat.ToLower() == "soap" || responseFormat.ToLower() == "xml")
+            {
+                var xml = SerializeToSoap.Serialize(result);
+                return Content(xml, "application/soap+xml");
+            }
+
+            return Ok(result);
         }
 
 

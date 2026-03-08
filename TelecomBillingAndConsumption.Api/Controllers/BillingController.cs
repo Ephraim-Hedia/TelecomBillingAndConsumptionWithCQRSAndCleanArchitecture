@@ -35,7 +35,9 @@ namespace TelecomBillingAndConsumption.Api.Controllers
         }
 
         [HttpGet(Router.BillingRouting.GetMyBillsByMonth)]
-        public async Task<IActionResult> GetMyBillsByMonth([FromQuery] string month)
+        public async Task<IActionResult> GetMyBillsByMonth(
+            [FromQuery] string month,
+            [FromQuery] string responseFormat = "json")
         {
             var subscriberId = User.GetSubscriberId();
 
@@ -47,6 +49,12 @@ namespace TelecomBillingAndConsumption.Api.Controllers
                 SubscriberId = subscriberId.Value,
                 Month = month
             });
+
+            if (responseFormat.ToLower() == "soap" || responseFormat.ToLower() == "xml")
+            {
+                var xml = SerializeToSoap.Serialize(result);
+                return Content(xml, "application/soap+xml");
+            }
 
             return Ok(result);
         }
@@ -75,10 +83,15 @@ namespace TelecomBillingAndConsumption.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet(Router.BillingRouting.getBySubscriberIdAndMonth)]
-        public async Task<IActionResult> GetBySubscriberIdAndMonth(int subscriberId, string month)
+        public async Task<IActionResult> GetBySubscriberIdAndMonth(int subscriberId, string month, [FromQuery] string responseFormat = "json")
         {
             var result = await Mediator.Send(new GetBillBySubscriberIdAndMonthQuery() { SubscriberId = subscriberId, Month = month });
-            return Ok(result);
+            if (responseFormat.ToLower() == "soap" || responseFormat.ToLower() == "xml")
+            {
+                var xml = SerializeToSoap.Serialize(result); // Or standard xml
+                return Content(xml, "application/soap+xml");
+            }
+            return NewResult(result);
         }
 
         [Authorize(Roles = "Admin")]

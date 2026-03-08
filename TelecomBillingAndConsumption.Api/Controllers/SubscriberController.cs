@@ -18,7 +18,7 @@ namespace TelecomBillingAndConsumption.Api.Controllers
         // ==============================
 
         [HttpGet(Router.Subscribers.GetMySubscriber)]
-        public async Task<IActionResult> GetMySubscriber()
+        public async Task<IActionResult> GetMySubscriber([FromQuery] string responseFormat = "json")
         {
             var subscriberId = User.GetSubscriberId();
 
@@ -26,6 +26,12 @@ namespace TelecomBillingAndConsumption.Api.Controllers
                 return Unauthorized();
 
             var result = await Mediator.Send(new GetSubscriberByIdQuery(subscriberId.Value));
+
+            if (responseFormat.ToLower() == "soap" || responseFormat.ToLower() == "xml")
+            {
+                var xml = SerializeToSoap.Serialize(result);
+                return Content(xml, "application/soap+xml");
+            }
 
             return Ok(result);
         }
@@ -45,8 +51,18 @@ namespace TelecomBillingAndConsumption.Api.Controllers
 
         [Authorize(Roles = "Admin")]
         [HttpGet(Router.Subscribers.getById)]
-        public async Task<IActionResult> GetById(int id)
-        => Ok(await Mediator.Send(new GetSubscriberByIdQuery(id)));
+        public async Task<IActionResult> GetById(int id, [FromQuery] string responseFormat = "json")
+        {
+            var result = await Mediator.Send(new GetSubscriberByIdQuery(id));
+
+            if (responseFormat.ToLower() == "soap" || responseFormat.ToLower() == "xml")
+            {
+                var xml = SerializeToSoap.Serialize(result);
+                return Content(xml, "application/soap+xml");
+            }
+
+            return Ok(result);
+        }
 
         [Authorize(Roles = "Admin")]
         [HttpPost(Router.Subscribers.create)]
