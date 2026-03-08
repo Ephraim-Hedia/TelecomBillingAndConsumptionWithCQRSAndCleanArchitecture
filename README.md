@@ -350,18 +350,53 @@ Each usage record includes:
 
 Each usage record is priced using **Tariff Rules** based on:
 
-- Usage type (Call / Data / SMS)
-- Roaming status
-- Peak or Off-Peak hours
+- Usage type (**Call / Data / SMS**)
+- Roaming status (**Domestic or Roaming**)
+- Peak or Off-Peak hours (for calls)
 
-Example:
+Tariff rules are stored in the **TariffRules** table and are seeded when the application starts.
 
-| Usage Type | Condition | Price |
-|------------|-----------|-------|
-| Call | Peak | Higher Rate |
-| Call | Off-Peak | Lower Rate |
-| Data | Roaming | Higher Rate |
-| SMS | Domestic | Base Rate |
+---
+
+### Call Pricing
+
+Peak hours are defined as:
+
+08:00 AM → 08:00 PM
+
+
+| Usage Type | Roaming | Peak | Price Per Unit |
+|------------|--------|------|----------------|
+| Call | Domestic | Off-Peak | 0.05 |
+| Call | Domestic | Peak | 0.15 |
+| Call | Roaming | Off-Peak | 0.15 |
+| Call | Roaming | Peak | 0.15 |
+
+---
+
+### Data Pricing
+
+| Usage Type | Roaming | Price Per MB |
+|------------|--------|--------------|
+| Data | Domestic | 0.05 |
+| Data | Roaming | 0.20 |
+
+---
+
+### SMS Pricing
+
+| Usage Type | Roaming | Price Per SMS |
+|------------|--------|---------------|
+| SMS | Domestic | 0.02 |
+| SMS | Roaming | 0.10 |
+
+---
+
+### Important Notes
+
+- **Peak pricing applies only to calls.**
+- **Data and SMS do not have peak/off-peak pricing.**
+- If a subscriber exceeds their monthly bundle limits, **the extra usage is charged at double the normal tariff rate.**
 
 ---
 
