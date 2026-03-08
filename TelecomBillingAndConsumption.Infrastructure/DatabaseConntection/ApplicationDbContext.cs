@@ -14,7 +14,6 @@ namespace TelecomBillingAndConsumption.Infrastructure.DatabaseConntection
         public DbSet<UsageRecord> UsageRecords { get; set; }
         public DbSet<Bill> Bills { get; set; }
         public DbSet<BillDetail> BillDetails { get; set; }
-        public DbSet<Payment> Payments { get; set; }
         public DbSet<TariffRule> TariffRules { get; set; }
 
         public DbSet<UserRefreshToken> UserRefreshToken { get; set; }

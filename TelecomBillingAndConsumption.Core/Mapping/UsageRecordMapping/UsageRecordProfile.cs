@@ -9,7 +9,6 @@ namespace TelecomBillingAndConsumption.Core.Mapping.UsageRecordMapping
             AddUsageRecordMapping();
             GetUsageRecordByIdMapping();
             GetUsageRecordsBySubscriberIdMapping();
-            GetUsageSummaryBySubscriberIdMapping();
         }
     }
 }
