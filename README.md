@@ -465,7 +465,7 @@ cd TelecomBillingAndConsumption
 
 ### Step 2: Run Docker Containers
 
-Run the following command:
+Run the following command: **docker compose up --build**
 
 
 This will start:
@@ -494,7 +494,7 @@ Sample usage records
 
 ### Step 4: Access the API
 
-Open the API at: https://localhost:8080
+Open the API at: **https://localhost:8080**
 
 Swagger documentation will be available if enabled.
 
@@ -516,9 +516,9 @@ Password: User@123
 ### Step 6: Stop Containers
 
 To stop the system:
-docker-compose down
+**docker-compose down**
 If you want to remove the database volume as well:
-docker-compose down -v
+**docker-compose down -v**
 
 
 ## Test Credentials
