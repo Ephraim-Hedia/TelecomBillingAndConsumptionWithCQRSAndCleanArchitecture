@@ -458,7 +458,7 @@ The project includes a Docker configuration that runs both:
 - Docker Compose
 ---
 ### Step 1: Clone the Repository
-**git clone https://github.com/yourusername/TelecomBillingAndConsumption.git**
+**https://github.com/Ephraim-Hedia/TelecomBillingAndConsumptionWithCQRSAndCleanArchitecture.git**
 
 **cd TelecomBillingAndConsumption**
 
