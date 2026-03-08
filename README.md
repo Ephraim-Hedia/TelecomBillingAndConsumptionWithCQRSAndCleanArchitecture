@@ -37,8 +37,15 @@ A RESTful API built with ASP.NET Core for managing telecom subscribers, tracking
 - JWT Authentication
 - Role-based Authorization (Admin / User)
 
+
 #### Validation
 - FluentValidation
+- Request validation for Commands and Queries
+- Business rule validation
+
+#### MediatR Pipeline Behaviors
+- TransactionBehavior for automatic database transaction handling
+- Ensures atomic operations for commands
 
 #### Object Mapping
 - AutoMapper
