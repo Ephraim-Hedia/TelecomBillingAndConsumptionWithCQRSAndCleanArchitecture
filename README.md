@@ -458,9 +458,9 @@ The project includes a Docker configuration that runs both:
 - Docker Compose
 ---
 ### Step 1: Clone the Repository
-git clone https://github.com/yourusername/TelecomBillingAndConsumption.git
+**git clone https://github.com/yourusername/TelecomBillingAndConsumption.git**
 
-cd TelecomBillingAndConsumption
+**cd TelecomBillingAndConsumption**
 
 ---
 
