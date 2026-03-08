@@ -161,31 +161,54 @@ View personal bills
 
 ## API Endpoints
 
-Authentication
-POST /api/auth/register
-POST /api/auth/login
+### Authentication
 
-Subscribers
-POST /api/subscribers
-GET /api/subscribers
-PUT /api/subscribers/{id}
-DELETE /api/subscribers/{id}
+| Method | Endpoint | Description |
+|------|------|------|
+| POST | `/api/auth/register` | Register a new user |
+| POST | `/api/auth/login` | Authenticate user and return JWT token |
 
-Usage
-POST /api/usage
-POST /api/usage/bulk
-GET /api/usage/me
-GET /api/usage/subscriber/{id}
+---
 
-Billing
-POST /api/billing/{subscriberId}/{month}
-GET /api/billing/{billId}
-GET /api/billing/{subscriberId}/{month}
+### Subscribers
 
-Dashboard
-GET /api/statistics/top-consumers
-GET /api/statistics/revenue
-GET /api/statistics/usage
+| Method | Endpoint | Description |
+|------|------|------|
+| POST | `/api/subscribers` | Create a new subscriber |
+| GET | `/api/subscribers` | Get all subscribers |
+| PUT | `/api/subscribers/{id}` | Update subscriber information |
+| DELETE | `/api/subscribers/{id}` | Delete subscriber |
+
+---
+
+### Usage Records
+
+| Method | Endpoint | Description |
+|------|------|------|
+| POST | `/api/usage` | Add a usage record |
+| POST | `/api/usage/bulk` | Add multiple usage records |
+| GET | `/api/usage/me` | Get usage records for the current user |
+| GET | `/api/usage/subscriber/{id}` | Get usage records for a specific subscriber |
+
+---
+
+### Billing
+
+| Method | Endpoint | Description |
+|------|------|------|
+| POST | `/api/billing/{subscriberId}/{month}` | Generate monthly bill |
+| GET | `/api/billing/{billId}` | Get bill details |
+| GET | `/api/billing/{subscriberId}/{month}` | Get bill by subscriber and month |
+
+---
+
+### Dashboard
+
+| Method | Endpoint | Description |
+|------|------|------|
+| GET | `/api/statistics/top-consumers` | Get top customers by consumption |
+| GET | `/api/statistics/revenue` | Get revenue statistics |
+| GET | `/api/statistics/usage` | Get usage statistics |
 
 ## Validation
 
