@@ -521,23 +521,6 @@ If you want to remove the database volume as well:
 docker-compose down -v
 
 
-## System Architecture
-Client
-   │
-   ▼
-ASP.NET Core API
-   │
-   ├── Application Layer (CQRS + MediatR)
-   │
-   ├── Domain Services
-   │
-   └── Infrastructure (EF Core)
-            │
-            ▼
-        SQL Server
-
-
-
 ## Test Credentials
 
 Admin
